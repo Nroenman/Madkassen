@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{E03A7CBC-B05E-460A-9037-54E53E48F308}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary", "ClassLibrary\ClassLibrary.csproj", "{E03A7CBC-B05E-460A-9037-54E53E48F308}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{C3F341AA-34B7-421A-8D1A-9D5E5E719032}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MadkassenRestAPI", "MadkassenRestAPI\MadkassenRestAPI.csproj", "{C3F341AA-34B7-421A-8D1A-9D5E5E719032}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
