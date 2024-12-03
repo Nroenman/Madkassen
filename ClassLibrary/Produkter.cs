@@ -1,3 +1,6 @@
+namespace ClassLibrary 
+{
+
 public enum AllergyType
 {
     Gluten,
@@ -15,7 +18,7 @@ public class Produkter
     public string? Description { get; set; }
     public int CategoryId { get; set; }
     public bool Allergies { get; set; }
-    public AllergyType AllergyType { get; set; }
+    public AllergyType? AllergyType { get; set; }
     public double Price { get; set; }
     public int StockLevel { get; set; }
 
@@ -23,14 +26,14 @@ public class Produkter
     public Produkter() { }
 
     // Parameterized constructor for easier object creation
-    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType allergyType, double price, int stockLevel)
+    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType? allergyType, double price, int stockLevel)
     {
         ProductId = productId;
         ProductName = productName;
         Description = description;
         CategoryId = categoryId;
         Allergies = allergies;
-        AllergyType = allergyType;
+         AllergyType = allergies ? allergyType : null; // Set to null if Allergies is false
         Price = price;
         StockLevel = stockLevel;
     }
@@ -40,4 +43,6 @@ public class Produkter
     {
         return $"Product ID: {ProductId}, Name: {ProductName}, Category ID: {CategoryId}, Allergies: {Allergies}, Allergy Type: {AllergyType}, Price: {Price:C}, Stock Level: {StockLevel}";
     }
+}
+
 }

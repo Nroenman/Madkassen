@@ -1,4 +1,7 @@
-﻿public class Kategori
+﻿namespace ClassLibrary 
+{
+
+public class Kategori
 {
     public int CategoryId { get; set; }
     public string? CategoryName { get; set; }
@@ -20,4 +23,6 @@
     {
         return $"Category ID: {CategoryId}, Name: {CategoryName}, Description: {Description}";
     }
+}
+
 }
