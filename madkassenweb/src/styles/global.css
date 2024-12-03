@@ -22,3 +22,15 @@ body {
     width: 100%;
   }
   
+
+  .header-thumbnail {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+}
+
+.homepage-logo {
+  display: block;
+  margin: 50px auto;
+  max-width: 500px;
+}

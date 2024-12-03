@@ -1,19 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Toolbar, Button } from "@mui/material";
+import thumbnailmad from "../images/thumbnailmad.png";
+import '../styles/navbar.css';
 
 const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" style={{ flexGrow: 1 }}>
-          Madkassen
-        </Typography>
-        <Button color="inherit" component={Link} to="/">
-          Home
+        {/* Logo */}
+        <img 
+          src={thumbnailmad} 
+          alt="Madkassen Thumbnail" 
+          className="header-thumbnail" 
+          onClick={() => window.location.href = "/"} 
+        />
+        {/* Navigation Links */}
+        <Button color="inherit" component={Link} to="/madvarer">
+          Madvarer
+        </Button>
+        <Button color="inherit" component={Link} to="/drikkevarer">
+          Drikkevarer
         </Button>
         <Button color="inherit" component={Link} to="/about">
-          About
+          Om os
+        </Button>
+        <Button color="inherit" component={Link} to="/profile">
+          Min Profil
+        </Button>
+        {/* Login/Logout Button */}
+        <Button color="inherit" style={{ marginLeft: "auto" }}>
+          Log ind
         </Button>
       </Toolbar>
     </AppBar>
