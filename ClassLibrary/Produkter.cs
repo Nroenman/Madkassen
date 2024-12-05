@@ -4,11 +4,11 @@ namespace ClassLibrary
 public enum AllergyType
 {
     Gluten,
-    Dairy,
-    Nuts,
-    Shellfish,
-    Soy,
-    Eggs
+    Laktose,
+    Nødder,
+    Skaldyr,
+    Soya,
+    Æg
 }
 
 public class Produkter
