@@ -7,6 +7,7 @@ import Madvarer from "./components/Madvarer"; // Create this page
 import Drikkevarer from "./components/Drikkevarer"; // Create this page
 import Profile from "./components/Profile"; // Create this page
 import "./styles/global.css"; // Optional: Global styles
+import ProductList from "./components/ProductList";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/madvarer" element={<Madvarer />} />
         <Route path="/drikkevarer" element={<Drikkevarer />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/productlist" element={<ProductList />} />
       </Routes>
     </Router>
   );
