@@ -7,27 +7,19 @@ namespace MadkassenRestAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-
-        public UsersController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await context.Users.ToListAsync();
         }
 
         // GET: api/Users/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Users>> GetUserById(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await context.Users.FindAsync(id);
 
             if (user == null)
             {
@@ -42,8 +34,8 @@ namespace MadkassenRestAPI.Controllers
         public async Task<ActionResult<Users>> CreateUser(Users user)
         {
             user.CreatedAt = DateTime.UtcNow; // Automatically set CreatedAt
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
         }
@@ -57,11 +49,11 @@ namespace MadkassenRestAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            context.Entry(user).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -79,21 +71,21 @@ namespace MadkassenRestAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await context.Users.FindAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.UserId == id);
+            return context.Users.Any(e => e.UserId == id);
         }
     }
 }

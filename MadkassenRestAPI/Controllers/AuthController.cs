@@ -3,6 +3,9 @@ using JWT.Builder;
 using MadkassenRestAPI.Models;
 using MadkassenRestAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System;
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -10,7 +13,6 @@ namespace MadkassenRestAPI.Controllers
     [ApiController]
     public class AuthController(IUserService userService, IConfiguration configuration) : ControllerBase
     {
-
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

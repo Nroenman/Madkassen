@@ -1,19 +1,28 @@
 ﻿using MadkassenRestAPI.Models;
+using MadkassenRestAPI.Data; // Import your DbContext namespace
 using System.Linq;
 
 namespace MadkassenRestAPI.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository(ApplicationDbContext context) : IUserRepository
     {
-        private readonly List<User> _users = new List<User>(); // Example in-memory data store
-
-        // Method to retrieve user by email (or username)
-        public User GetByEmail(string email)
+       
+        public User? GetByEmail(string email)
         {
-            return _users.FirstOrDefault(u => u.Username == email); // Assuming Username is the email
+            var dbUser = context.Users.FirstOrDefault(u => u.Email == email);
+            if (dbUser == null) return null;
+
+            return new User
+            {
+                Username = dbUser.UserName,
+                Email = dbUser.Email,
+                PasswordHash = dbUser.PasswordHash,
+                UserName = dbUser.UserName,
+                Roles = dbUser.Roles,
+            };
         }
 
-        public void Add(User user)
+        public IEnumerable<User> GetAll()
         {
             throw new NotImplementedException();
         }
