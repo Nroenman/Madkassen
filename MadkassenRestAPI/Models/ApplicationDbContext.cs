@@ -9,6 +9,7 @@ namespace MadkassenRestAPI.Data
 
         public DbSet<Produkter> Produkter { get; set; }
         public DbSet<Kategori> Kategori { get; set; }
+        public DbSet<Users> Users {get; set;}
 
        protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,46 @@ namespace MadkassenRestAPI.Data
         modelBuilder.Entity<Produkter>()
             .Property(p => p.StockLevel)
             .HasColumnName("StockLevel");
+
+
+        modelBuilder.Entity<Users>()
+            .HasKey(u => u.UserId);
+            
+        modelBuilder.Entity<Users>()
+            .Property(u => u.UserName)
+            .HasColumnName("UserName")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<Users>()
+            .Property(u => u.Email)
+            .HasColumnName("Email")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<Users>()
+            .Property(u => u.PasswordHash)
+            .HasColumnName("PasswordHash")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<Users>()
+            .Property(u => u.CreatedAt)
+            .HasColumnName("CreatedAt")
+            .HasColumnType("datetime2") // SQL Server type
+            .IsRequired(true); // Ensure this field is always set
+
+        modelBuilder.Entity<Users>()
+            .Property(u => u.UpdatedAt)
+            .HasColumnName("UpdatedAt")
+            .HasColumnType("datetime2") // SQL Server type
+            .IsRequired(true); // Allow null values
+
+        modelBuilder.Entity<Users>()
+            .Property(u => u.Roles)
+            .HasColumnName("Roles")
+            .HasMaxLength(50)
+            .IsRequired();
     }
     }
 }
