@@ -2,10 +2,9 @@ import React from "react";
 
 const AboutPage = () => {
   return (
-    <div>
-      <h1>Om os</h1>
-      <p>Madkassen is a platform designed to bring you personalized food recommendations.</p>
-    </div>
+      <h1 className="text-3xl font-bold underline">
+          Hello world!
+      </h1>
   );
 };
 

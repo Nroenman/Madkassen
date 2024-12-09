@@ -3,16 +3,16 @@ body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
   }
-  
+
   main {
     padding: 20px;
     background-color: #ffffff;
   }
-  
+
   h1 {
     margin-bottom: 10px;
   }
-  
+
   footer {
     text-align: center;
     background-color: #f1f1f1;
@@ -21,7 +21,7 @@ body {
     bottom: 0;
     width: 100%;
   }
-  
+
 
   .header-thumbnail {
     width: 80px;
@@ -34,3 +34,6 @@ body {
   margin: 50px auto;
   max-width: 500px;
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
