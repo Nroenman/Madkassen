@@ -16,12 +16,6 @@ const Navbar = () => {
           onClick={() => window.location.href = "/"} 
         />
         {/* Navigation Links */}
-        <Button color="inherit" component={Link} to="/madvarer">
-          Madvarer
-        </Button>
-        <Button color="inherit" component={Link} to="/drikkevarer">
-          Drikkevarer
-        </Button>
         <Button color="inherit" component={Link} to="/productlist">
           Produkter
         </Button>
