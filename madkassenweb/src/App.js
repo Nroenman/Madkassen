@@ -6,7 +6,7 @@ import AboutPage from "./components/AboutPage"; // Already exists
 import Profile from "./components/Profile"; // Create this page
 import ProductList from "./components/ProductList";
 import CategoryList from "./components/CategoryList";
-import index from "./index.css"
+import "./index.css"
 
 
 const App = () => {
