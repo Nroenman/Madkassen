@@ -4,9 +4,10 @@ import Navbar from "./components/Navbar"; // Adjust the path if needed
 import HomePage from "./components/HomePage"; // Create this page
 import AboutPage from "./components/AboutPage"; // Already exists
 import Profile from "./components/Profile"; // Create this page
-import "./styles/global.css"; // Optional: Global styles
 import ProductList from "./components/ProductList";
 import CategoryList from "./components/CategoryList";
+import index from "./index.css"
+
 
 const App = () => {
   return (
