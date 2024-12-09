@@ -6,6 +6,7 @@ import AboutPage from "./components/AboutPage"; // Already exists
 import Profile from "./components/Profile"; // Create this page
 import "./styles/global.css"; // Optional: Global styles
 import ProductList from "./components/ProductList";
+import CategoryList from "./components/CategoryList";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/productlist" element={<ProductList />} />
+        <Route path="/categorylist" element={<CategoryList />} />
       </Routes>
     </Router>
   );
