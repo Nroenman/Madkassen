@@ -21,12 +21,13 @@ public class Produkter
     public AllergyType? AllergyType { get; set; }
     public double Price { get; set; }
     public int StockLevel { get; set; }
+    public string? ImageUrl { get; set; }
 
     // Default constructor
     public Produkter() { }
 
     // Parameterized constructor for easier object creation
-    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType? allergyType, double price, int stockLevel)
+    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType? allergyType, double price, int stockLevel, string imageUrl)
     {
         ProductId = productId;
         ProductName = productName;
@@ -36,6 +37,7 @@ public class Produkter
          AllergyType = allergies ? allergyType : null; // Set to null if Allergies is false
         Price = price;
         StockLevel = stockLevel;
+        ImageUrl = imageUrl;
     }
 
     // Override ToString method for better string representation

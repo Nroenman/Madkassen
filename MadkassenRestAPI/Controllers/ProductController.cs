@@ -18,24 +18,41 @@ namespace MadkassenRestAPI.Controllers
         }
 
         // Get all products
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
+       [HttpGet]
+public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
+{
+    var products = await _context.Produkter.ToListAsync();
+
+    // Apply placeholder only if ImageUrl is null or empty
+    foreach (var product in products)
+    {
+        if (string.IsNullOrEmpty(product.ImageUrl))
         {
-            var products = await _context.Produkter.ToListAsync();
-            return Ok(products);
+            product.ImageUrl = "https://i.imghippo.com/files/KCsO2582jBE.png";  // Apply placeholder if null or empty
         }
+    }
+
+    return Ok(products);
+}
 
         // Get a product by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Produkter>> GetProduct(int id)
-        {
-            var product = await _context.Produkter.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return Ok(product);
-        }
+public async Task<ActionResult<Produkter>> GetProduct(int id)
+{
+    var product = await _context.Produkter.FindAsync(id);
+    if (product == null)
+    {
+        return NotFound();
+    }
+
+    // Apply placeholder only if ImageUrl is null or empty
+    if (string.IsNullOrEmpty(product.ImageUrl))
+    {
+        product.ImageUrl = "https://i.imghippo.com/files/KCsO2582jBE.png";  // Apply placeholder if null or empty
+    }
+
+    return Ok(product);
+}
 
         // Add a new product
         [HttpPost]
