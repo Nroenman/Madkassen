@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import useProducts from "../Hooks/useProducts"; // Import the hook
 
 const ProductList = () => {
-    const [products, setProducts] = useState([]);
-    const [error, setError] = useState(null);
+    const { products, loading, error } = useProducts(); // Use the hook
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await axios.get("http://localhost:5092/api/Product");
-                setProducts(response.data); // Axios automatically parses JSON
-            } catch (err) {
-                console.error("Error fetching products:", err);
-                setError(err.response?.data?.message || "Something went wrong");
-            }
-        };
+    if (loading) {
+        return <div>Loading products...</div>;
+    }
 
-        fetchProducts();
-    }, []);
-
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     const allergyTypeNames = {
         0: "Gluten",
@@ -29,14 +21,9 @@ const ProductList = () => {
         5: "Æg"
     };
 
-
-    if (products.length === 0) {
-        return <div>No products found.</div>;
-    }
-
     return (
         <div>
-            <h1>Products</h1>
+            <h1>Produkter</h1>
             <ul>
                 {products.map((product) => (
                     <li key={product.productId}>
