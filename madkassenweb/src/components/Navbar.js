@@ -16,6 +16,9 @@ const Navbar = () => {
           onClick={() => window.location.href = "/"} 
         />
         {/* Navigation Links */}
+        <Button color="inherit" component={Link} to="/categoryList">
+          Kategorier
+        </Button>
         <Button color="inherit" component={Link} to="/productlist">
           Produkter
         </Button>
