@@ -18,6 +18,15 @@ builder.Services.AddScoped<IUserRepository, UserRepository>(); // Add repository
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Add Swagger services
 builder.Services.AddSwaggerGen(options =>
@@ -78,6 +87,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 
 // Use authentication middleware before authorization middleware
 app.UseAuthentication();
