@@ -2,49 +2,82 @@ import React from "react";
 import {Link} from "react-router-dom";
 import {AppBar, Toolbar, Button} from "@mui/material";
 import thumbnailmad from "../images/thumbnailmad.png";
-import '../styles/navbar.css';
 import useAuth from "../Hooks/useAuth"; // Import the useAuth hook
 
 const Navbar = () => {
     const {isAuthenticated, logout} = useAuth(); // Get the authentication status and logout function
 
     return (
-        <AppBar position="static">
-            <Toolbar>
+        <AppBar position="static" className="bg-indigo-600 shadow-md">
+            <Toolbar className="flex justify-between items-center px-6 py-3">
                 {/* Logo */}
                 <img
                     src={thumbnailmad}
                     alt="Madkassen Thumbnail"
-                    className="header-thumbnail"
+                    className="h-10 cursor-pointer"
                     onClick={() => window.location.href = "/"}
                 />
-                {/* Navigation Links */}
-                <Button color="inherit" component={Link} to="/categoryList">
-                    Kategorier
-                </Button>
-                <Button color="inherit" component={Link} to="/productlist">
-                    Produkter
-                </Button>
-                <Button color="inherit" component={Link} to="/about">
-                    Om os
-                </Button>
 
-                {isAuthenticated() && (
-                    <Button color="inherit" component={Link} to="/profile">
-                        Min Profil
+                {/* Navigation Links */}
+                <div className="flex space-x-6">
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/categoryList"
+                        className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                    >
+                        Kategorier
                     </Button>
-                )}
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/productlist"
+                        className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                    >
+                        Produkter
+                    </Button>
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/about"
+                        className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                    >
+                        Om os
+                    </Button>
+
+                    {isAuthenticated() && (
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/profile"
+                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                        >
+                            Min Profil
+                        </Button>
+                    )}
+                </div>
 
                 {/* Conditionally render Login or Logout button based on authentication */}
-                {!isAuthenticated() ? (
-                    <Button color="inherit" component={Link} to="/login">
-                        Login
-                    </Button>
-                ) : (
-                    <Button color="inherit" onClick={logout}>
-                        Logout
-                    </Button>
-                )}
+                <div className="flex space-x-4">
+                    {!isAuthenticated() ? (
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/login"
+                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                        >
+                            Login
+                        </Button>
+                    ) : (
+                        <Button
+                            color="inherit"
+                            onClick={logout}
+                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                        >
+                            Logout
+                        </Button>
+                    )}
+                </div>
             </Toolbar>
         </AppBar>
     );
