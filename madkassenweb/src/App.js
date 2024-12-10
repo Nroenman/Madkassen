@@ -15,17 +15,6 @@ const App = () => {
     return (
         <Router>
             {/* Navbar is always displayed */}
-            <Navbar/>
-            {/* Define Routes for the pages */}
-            <Routes>
-                <Route path="/" element={<HomePage/>}/>
-                <Route path="/about" element={<AboutPage/>}/>
-                <Route path="/profile" element={<Profile/>}/>
-                <Route path="/productlist" element={<ProductList/>}/>
-                <Route path="/products/:id" element={<ProductDetails />} />
-                <Route path="/categorylist" element={<CategoryList/>}/>
-                <Route path="/login" element={<LoginPage/>}/>
-            </Routes>
             <div>
                 {/* Top Navbar */}
                 <Navbar />
@@ -42,6 +31,7 @@ const App = () => {
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/productlist" element={<ProductList />} />
+                            <Route path="/products/:id" element={<ProductDetails />} />
                             <Route path="/categorylist" element={<CategoryList />} />
                             <Route path="/login" element={<LoginPage />} />
                         </Routes>
