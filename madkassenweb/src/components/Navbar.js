@@ -8,7 +8,7 @@ const Navbar = () => {
     const {isAuthenticated, logout} = useAuth(); // Get the authentication status and logout function
 
     return (
-        <AppBar position="static" className="bg-indigo-600 shadow-md">
+        <AppBar position="fixed" className="bg-indigo-600 shadow-md">
             <Toolbar className="flex justify-between items-center px-6 py-3">
                 {/* Logo */}
                 <img
