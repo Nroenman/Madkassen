@@ -10,5 +10,5 @@ export const login = async (email, password) => {
         throw new Error(errorData.message || 'Invalid credentials');
     }
 
-    return response.json();  // Assuming the API returns the token in the response
+    return response.json();  // Assuming the Api returns the token in the response
 };

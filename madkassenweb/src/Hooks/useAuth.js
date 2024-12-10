@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin } from '../API/Auth';
+import { login as apiLogin } from '../Api/Auth';
 
 const useAuth = () => {
     const [error, setError] = useState(null);
