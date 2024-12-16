@@ -33,7 +33,18 @@ namespace MadkassenRestAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> CreateUser(Users user)
         {
+            if (string.IsNullOrEmpty(user.UserName)) {
+                return BadRequest("UserName is required.");
+            }
+            if (string.IsNullOrEmpty(user.Email)) {
+                return BadRequest("Email is required.");
+            }
+            if (string.IsNullOrEmpty(user.PasswordHash)) {
+                return BadRequest("Password is required.");
+            }
+
             user.CreatedAt = DateTime.UtcNow; // Automatically set CreatedAt
+            user.UpdatedAt = DateTime.UtcNow; // Automatically set UpdatedAt
             context.Users.Add(user);
             await context.SaveChangesAsync();
 

@@ -12,7 +12,7 @@ namespace MadkassenRestAPI.Services
             
             if (user == null)
             {
-                return null; // If the user is not found
+                return null; 
             }
 
             if (user.PasswordHash != password)
@@ -20,7 +20,6 @@ namespace MadkassenRestAPI.Services
                 return null; 
             }
 
-            // If the user is authenticated, return the user object without sensitive information
             return new User
             {
                 UserId = user.UserId,

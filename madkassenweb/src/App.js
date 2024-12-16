@@ -10,6 +10,8 @@ import ProductDetails from "./components/productDetails";
 import CategoryList from "./components/CategoryList";
 import LoginPage from "./components/LoginPage";
 import "./index.css";
+import signUpPage from "./components/SignUpPage";
+import SignUpPage from "./components/SignUpPage";
 
 const App = () => {
     return (
@@ -34,6 +36,7 @@ const App = () => {
                             <Route path="/products/:id" element={<ProductDetails />} />
                             <Route path="/categorylist" element={<CategoryList />} />
                             <Route path="/login" element={<LoginPage />} />
+                            <Route path="/signup" element={<SignUpPage />} />
                         </Routes>
                     </div>
                 </div>
