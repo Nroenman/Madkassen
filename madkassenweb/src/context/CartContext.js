@@ -21,32 +21,99 @@ export const CartProvider = ({ children }) => {
     }, [cartItems]);
 
     // Add product to cart
-    const addToCart = (product, quantity) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find((item) => item.productId === product.productId);
-            if (existingItem) {
-                return prevItems.map((item) =>
-                    item.productId === product.productId
-                        ? { ...item, quantity: item.quantity + quantity }
-                        : item
-                );
+    const addToCart = async (product, quantity) => {
+        const userId = JSON.parse(localStorage.getItem("userId"));
+        const requestData = {
+            productId: product.productId,
+            userId: userId,
+            quantity: quantity
+        };
+    
+        console.log('Sending request:', requestData); // Log the request data
+    
+        try {
+            const response = await fetch('http://localhost:5092/api/Cart/add-to-cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+    
+            if (!response.ok) {
+                const errorDetails = await response.text();  // Capture the error message for debugging
+                console.error('Error adding to cart:', errorDetails);
+                throw new Error("Failed to add to cart");
             }
-            return [...prevItems, { ...product, quantity }];
-        });
+    
+            setCartItems((prevItems) => {
+                const existingItem = prevItems.find((item) => item.productId === product.productId);
+                if (existingItem) {
+                    return prevItems.map((item) =>
+                        item.productId === product.productId
+                            ? { ...item, quantity: item.quantity + quantity }
+                            : item
+                    );
+                }
+                return [...prevItems, { ...product, quantity }];
+            });
+        } catch (error) {
+            console.error('Add to cart error:', error);
+        }
     };
+    
 
-    // Update product quantity
-    const updateQuantity = (productId, newQuantity) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.productId === productId ? { ...item, quantity: newQuantity } : item
-            )
-        );
+    
+
+    // Update product quantity in cart
+    const updateQuantity = async (productId, newQuantity) => {
+        const userId = JSON.parse(localStorage.getItem("userId"));
+        try {
+            const response = await fetch('http://localhost:5092/api/Cart/update-cart-item', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productId,        // Pass the product ID
+                    userId: userId,              // Pass the user ID
+                    quantity: newQuantity,       // Pass the updated quantity
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to update cart item");
+            }
+    
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.productId === productId ? { ...item, quantity: newQuantity } : item
+                )
+            );
+        } catch (error) {
+            console.error(error);
+        }
     };
+    
 
     // Remove product from cart
-    const removeFromCart = (productId) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item.productId !== productId));
+    const removeFromCart = async (productId) => {
+        try {
+            const response = await fetch(`http://localhost:5092/api/Cart/remove-from-cart`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error("Failed to remove from cart");
+            }
+    
+            setCartItems((prevItems) => prevItems.filter((item) => item.productId !== productId));
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     // Calculate total price

@@ -63,5 +63,30 @@ public async Task<ActionResult<Produkter>> GetProduct(int id)
 
             return CreatedAtAction(nameof(GetProduct), new { id = product.ProductId }, product);
         }
+
+[HttpPut("{id}")]
+public async Task<IActionResult> UpdateProductStock(int id, [FromBody] UpdateStockRequest request)
+{
+    var product = await _context.Produkter.FindAsync(id);
+    if (product == null)
+    {
+        return NotFound("Product not found");
+    }
+
+    // Ensure that the stock is enough to reserve the quantity
+    if (product.StockLevel < request.Quantity)
+    {
+        return BadRequest("Not enough stock available");
+    }
+
+    // Deduct stock for reservation
+    product.StockLevel -= request.Quantity;
+
+    // Save the updated product
+    await _context.SaveChangesAsync();
+
+    return Ok(product);
+}
+
     }
 }
