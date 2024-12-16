@@ -10,6 +10,8 @@ const SignUpPage = () => {
     const [userName, setUserName] = useState('');
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(''); // State for success message
+    const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
+    const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // Toggle confirm password visibility
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -88,9 +90,9 @@ const SignUpPage = () => {
                         <label htmlFor="password" className="block text-sm font-medium text-gray-900">
                             Password
                         </label>
-                        <div className="mt-2">
+                        <div className="mt-2 relative">
                             <input
-                                type="password"
+                                type={passwordVisible ? "text" : "password"} // Toggle between password and text
                                 name="password"
                                 id="password"
                                 value={password}
@@ -99,6 +101,13 @@ const SignUpPage = () => {
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                 placeholder="Indtast din kode"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setPasswordVisible(!passwordVisible)}
+                                className="absolute right-2 top-2 text-sm text-indigo-600"
+                            >
+                                {passwordVisible ? "Hide" : "Show"}
+                            </button>
                         </div>
                     </div>
 
@@ -106,9 +115,9 @@ const SignUpPage = () => {
                         <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-900">
                             Confirm Password
                         </label>
-                        <div className="mt-2">
+                        <div className="mt-2 relative">
                             <input
-                                type="password"
+                                type={confirmPasswordVisible ? "text" : "password"}
                                 name="confirm-password"
                                 id="confirm-password"
                                 value={confirmPassword}
@@ -117,6 +126,13 @@ const SignUpPage = () => {
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                 placeholder="Bekræft din kode"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                                className="absolute right-2 top-2 text-sm text-indigo-600"
+                            >
+                                {confirmPasswordVisible ? "Hide" : "Show"}
+                            </button>
                         </div>
                     </div>
 

@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import useAuth from '../Hooks/useAuth';
 import logomad from "../images/logomad.png";
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const {login, error} = useAuth();
+    const [passwordVisible, setPasswordVisible] = useState(false); // Added state to toggle password visibility
+    const { login, error } = useAuth();
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,7 +22,8 @@ const LoginPage = () => {
                     alt="Your Company"
                 />
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-Login                </h2>
+                    Login
+                </h2>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -55,9 +57,9 @@ Login                </h2>
                                 </a>
                             </div>
                         </div>
-                        <div className="mt-2">
+                        <div className="mt-2 relative">
                             <input
-                                type="password"
+                                type={passwordVisible ? "text" : "password"} // Toggle between text and password
                                 name="password"
                                 id="password"
                                 value={password}
@@ -66,6 +68,13 @@ Login                </h2>
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                 placeholder="Enter your password"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setPasswordVisible(!passwordVisible)} // Toggle visibility
+                                className="absolute right-2 top-2 text-sm text-indigo-600"
+                            >
+                                {passwordVisible ? "Hide" : "Show"}
+                            </button>
                         </div>
                     </div>
 
@@ -86,9 +95,7 @@ Login                </h2>
                     <a href="signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
                         Opret dig her
                     </a>
-
                 </p>
-
             </div>
         </div>
     );
