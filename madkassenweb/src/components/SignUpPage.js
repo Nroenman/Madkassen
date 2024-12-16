@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom'; // Import useNavigate hook
 import useRegister from '../Hooks/useRegistrer';
 import logomad from "../images/logomad.png";
 
@@ -8,7 +8,7 @@ const SignUpPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [userName, setUserName] = useState('');
-    const { register, error } = useRegister();
+    const {register, error} = useRegister();
     const navigate = useNavigate(); // Initialize useNavigate hook
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -19,14 +19,12 @@ const SignUpPage = () => {
             return;
         }
         try {
-            // Register the user
             await register(email, password, userName);
             setSuccessMessage('Account successfully created! Redirecting to login...');
 
-            // Redirect to login page after successful registration
             setTimeout(() => {
-                navigate('/login');  // Redirect to login page
-            }, 2000);  // Delay the redirection by 2 seconds to show the success message
+                navigate('/login');
+            }, 4000);
         } catch (error) {
             console.error("Error during registration:", error);
         }
@@ -38,7 +36,7 @@ const SignUpPage = () => {
                 <img
                     className="mx-auto h-10 w-auto"
                     src={logomad}
-                    alt="Your Company"
+                    alt="Madkassen"
                 />
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
                     Create Account
@@ -60,7 +58,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setUserName(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter your user name"
+                                placeholder="Indtast brugernavn "
                             />
                         </div>
                     </div>
@@ -78,7 +76,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter your email"
+                                placeholder="Indtast Email address"
                             />
                         </div>
                     </div>
@@ -96,7 +94,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter your password"
+                                placeholder="Password"
                             />
                         </div>
                     </div>
@@ -114,7 +112,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Confirm your password"
+                                placeholder="Bekræft Password"
                             />
                         </div>
                     </div>
@@ -124,7 +122,7 @@ const SignUpPage = () => {
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-600"
                         >
-                            Sign Up
+                            Opret bruger
                         </button>
                     </div>
                 </form>
@@ -133,7 +131,7 @@ const SignUpPage = () => {
                 {successMessage && <p className="mt-4 text-green-500 text-center">{successMessage}</p>}
 
                 <p className="mt-10 text-center text-sm text-gray-500">
-                    Already have an account?{' '}
+                    Har du allerede en bruger?{' '}
                     <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
                         Log in
                     </a>
