@@ -12,9 +12,12 @@ import LoginPage from "./components/LoginPage";
 import "./index.css";
 import signUpPage from "./components/SignUpPage";
 import SignUpPage from "./components/SignUpPage";
+import { CartProvider } from "./context/CartContext";
+import Cart from "./components/Cart";
 
 const App = () => {
     return (
+    <CartProvider>
         <Router>
             {/* Navbar is always displayed */}
             <div>
@@ -37,11 +40,14 @@ const App = () => {
                             <Route path="/categorylist" element={<CategoryList />} />
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/signup" element={<SignUpPage />} />
+                            <Route path="/cart" element={<Cart />} />
+
                         </Routes>
                     </div>
                 </div>
             </div>
         </Router>
+    </CartProvider>
     );
 };
 
