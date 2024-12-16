@@ -1,32 +1,35 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom'; // Import useNavigate hook
-import useRegister from '../Hooks/useRegistrer';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logomad from "../images/logomad.png";
+import { registerUser } from "../Api/RegistrerUserService";
 
 const SignUpPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [userName, setUserName] = useState('');
-    const {register, error} = useRegister();
-    const navigate = useNavigate(); // Initialize useNavigate hook
-    const [successMessage, setSuccessMessage] = useState('');
+    const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(''); // State for success message
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            alert('Passwords do not match!');
+            setError('Passwords do not match!');
+            setSuccessMessage('');
             return;
         }
-        try {
-            await register(email, password, userName);
-            setSuccessMessage('Account successfully created! Redirecting to login...');
 
+        try {
+            await registerUser(email, password, userName);
+            setSuccessMessage('Account created successfully! Please log in.'); // Success message
+            setError(null); // Clear any previous error
             setTimeout(() => {
-                navigate('/login');
-            }, 4000);
-        } catch (error) {
-            console.error("Error during registration:", error);
+                navigate('/login'); // Redirect to login after a short delay
+            }, 2000);
+        } catch (err) {
+            setError(err.message || 'Something went wrong!');
+            setSuccessMessage('');
         }
     };
 
@@ -47,7 +50,7 @@ const SignUpPage = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="userName" className="block text-sm font-medium text-gray-900">
-                            User Name
+                            Username
                         </label>
                         <div className="mt-2">
                             <input
@@ -58,7 +61,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setUserName(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Indtast brugernavn "
+                                placeholder="Indtast Brugernavn"
                             />
                         </div>
                     </div>
@@ -76,7 +79,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Indtast Email address"
+                                placeholder="Indtast email"
                             />
                         </div>
                     </div>
@@ -94,7 +97,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Password"
+                                placeholder="Indtast din kode"
                             />
                         </div>
                     </div>
@@ -112,7 +115,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Bekræft Password"
+                                placeholder="Bekræft din kode"
                             />
                         </div>
                     </div>
@@ -122,16 +125,19 @@ const SignUpPage = () => {
                             type="submit"
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-600"
                         >
-                            Opret bruger
+                            Sign Up
                         </button>
                     </div>
                 </form>
 
+                {successMessage && (
+                    <p className="mt-4 text-green-500 text-center">{successMessage}</p> // Success message
+                )}
+
                 {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
-                {successMessage && <p className="mt-4 text-green-500 text-center">{successMessage}</p>}
 
                 <p className="mt-10 text-center text-sm text-gray-500">
-                    Har du allerede en bruger?{' '}
+                    Allerede en bruger?{' '}
                     <a href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
                         Log in
                     </a>
