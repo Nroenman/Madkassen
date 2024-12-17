@@ -7,6 +7,7 @@ const Cart = () => {
     // Fetch cart items when the component mounts
     useEffect(() => {
         const userId = JSON.parse(localStorage.getItem("userId"));
+        console.log("useEffect triggered. User ID:", userId); // Debug log
         if (userId) {
             fetchCartItems(userId); // Fetch cart items for the logged-in user
         }
