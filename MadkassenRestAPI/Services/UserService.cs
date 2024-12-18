@@ -1,7 +1,6 @@
 ﻿using MadkassenRestAPI.Models; // Import the correct User model
 using MadkassenRestAPI.Data;    // Import the ApplicationDbContext
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 
 namespace MadkassenRestAPI.Services
 {
@@ -20,7 +19,7 @@ namespace MadkassenRestAPI.Services
         {
             // Find user by email
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            if (user == null || user.PasswordHash != password)
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
                 return null; // Return null if user doesn't exist or password doesn't match
             }

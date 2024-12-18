@@ -1,23 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
-using MadkassenRestAPI.Data;
 using MadkassenRestAPI.Models;
+using MadkassenRestAPI.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
+
 
 namespace MadkassenRestAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext context;
-
-        public UsersController(ApplicationDbContext context)
-        {
-            this.context = context;
-        }
-
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
@@ -97,6 +89,7 @@ namespace MadkassenRestAPI.Controllers
                 user.UserName = user.Email;
             }
 
+            // Hash password using BCrypt
             user.PasswordHash = HashPassword(user.PasswordHash);
 
             context.Users.Add(user);
@@ -111,7 +104,6 @@ namespace MadkassenRestAPI.Controllers
         {
             try
             {
-                // Get the authenticated user from JWT
                 var userFromJwt = (User)HttpContext.Items["User"];
 
                 if (userFromJwt == null)
@@ -119,7 +111,6 @@ namespace MadkassenRestAPI.Controllers
                     return Unauthorized();
                 }
 
-                // Find the user in the database
                 var user = await context.Users.FindAsync(userFromJwt.UserId);
 
                 if (user == null)
@@ -127,7 +118,6 @@ namespace MadkassenRestAPI.Controllers
                     return NotFound();
                 }
 
-                // Update the user's information directly
                 if (!string.IsNullOrEmpty(updateData.UserName))
                     user.UserName = updateData.UserName;
 
@@ -135,33 +125,23 @@ namespace MadkassenRestAPI.Controllers
                     user.Email = updateData.Email;
 
                 if (!string.IsNullOrEmpty(updateData.PasswordHash))
-                    user.PasswordHash = HashPassword(updateData.PasswordHash); // Password must be hashed before saving
+                    user.PasswordHash = HashPassword(updateData.PasswordHash); // Hashing password using BCrypt before saving
 
-                // Mark the time of update
                 user.UpdatedAt = DateTime.UtcNow;
 
-                // Save the changes to the database
                 await context.SaveChangesAsync();
 
                 return Ok(new { message = "User profile updated successfully." });
             }
             catch (Exception ex)
             {
-                // Log the exception and return a friendly error message
                 return BadRequest(new { message = "An error occurred while updating the user.", details = ex.Message });
             }
         }
 
         private string HashPassword(string password)
         {
-            using
-                (var
-                 sha256 = SHA256
-                     .Create()) // For illustration, SHA256 is used here. You should use a more secure method like bcrypt in production.
-            {
-                var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashBytes);
-            }
+            return BCrypt.Net.BCrypt.HashPassword(password); // Using BCrypt for password hashing
         }
     }
 }
