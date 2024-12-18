@@ -10,6 +10,7 @@ namespace MadkassenRestAPI.Data
         public DbSet<Produkter> Produkter { get; set; }
         public DbSet<Kategori> Kategori { get; set; }
         public DbSet<Users> Users {get; set;}
+        public DbSet<CartItem> CartItems { get; set; }
 
        protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -95,6 +96,38 @@ namespace MadkassenRestAPI.Data
             .HasColumnName("Roles")
             .HasMaxLength(50)
             .IsRequired();
+
+            modelBuilder.Entity<CartItem>()
+    .HasKey(c => c.CartItemId);  // Define the primary key for CartItem
+
+modelBuilder.Entity<CartItem>()
+    .Property(c => c.CartItemId)
+    .HasColumnName("CartItemId");
+
+modelBuilder.Entity<CartItem>()
+    .Property(c => c.ProductId)
+    .HasColumnName("ProductId")
+    .IsRequired();  // Assuming ProductId is required
+
+modelBuilder.Entity<CartItem>()
+    .Property(c => c.UserId)
+    .HasColumnName("UserId")
+    .IsRequired();  // Assuming UserId is required
+
+modelBuilder.Entity<CartItem>()
+    .Property(c => c.Quantity)
+    .HasColumnName("Quantity")
+    .IsRequired();  // Assuming Quantity is required
+
+modelBuilder.Entity<CartItem>()
+    .HasOne(c => c.Produkter)  // Link CartItem to Produkter (foreign key relationship)
+    .WithMany()  // A Product can be linked to many CartItems
+    .HasForeignKey(c => c.ProductId);  // Foreign key is ProductId
+
+modelBuilder.Entity<CartItem>()
+    .HasOne(c => c.Users)  // Link CartItem to Users (foreign key relationship)
+    .WithMany()  // A User can have many CartItems
+    .HasForeignKey(c => c.UserId);  // Foreign key is UserId
     }
     }
 }
