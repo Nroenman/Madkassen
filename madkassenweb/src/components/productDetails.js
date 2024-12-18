@@ -1,10 +1,14 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useProducts from "../Hooks/useProducts";
+import { useCart } from "../context/CartContext";
+import { useState } from "react";
 
 const ProductDetails = () => {
     const { id } = useParams(); // Get the product ID from the URL
     const { products, loading, error } = useProducts();
+    const { addToCart } = useCart(); // Access cart context
+    const [quantity, setQuantity] = useState(1);
 
     if (loading) {
         return <div>Loading product...</div>;
@@ -29,6 +33,12 @@ const ProductDetails = () => {
         4: "Soya",
         5: "Æg"
     };
+
+    const handleAddToCart = () => {
+        addToCart(product, quantity);
+        alert("Product added to basket!");
+    };
+
 
     return (
         <div className="bg-orange-50 min-h-screen">
@@ -58,9 +68,18 @@ const ProductDetails = () => {
                                 "Nej"
                             )}
                         </p>
-                        <button className="mt-4 px-4 py-2 bg-orange-500 text-white font-bold rounded-lg">
-                            Add to Basket
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="number"
+                                min="1"
+                                value={quantity}
+                                onChange={(e) => setQuantity(Number(e.target.value))}
+                                className="w-16 px-2 py-1 border rounded"
+                            />
+                            <button onClick={handleAddToCart} className="px-4 py-2 bg-orange-500 text-white font-bold rounded-lg">
+                                Add to Basket
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
