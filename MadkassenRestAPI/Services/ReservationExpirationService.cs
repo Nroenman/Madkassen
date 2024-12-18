@@ -1,46 +1,98 @@
 using MadkassenRestAPI.Models;
 using MadkassenRestAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace MadkassenRestAPI.Services {
-
-
-public class ReservationExpirationService : BackgroundService
+namespace MadkassenRestAPI.Services
 {
-    private readonly ApplicationDbContext _context;
-    private readonly ILogger<ReservationExpirationService> _logger;
-
-    public ReservationExpirationService(ApplicationDbContext context, ILogger<ReservationExpirationService> logger)
+    public class ReservationExpirationService : BackgroundService
     {
-        _context = context;
-        _logger = logger;
-    }
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ReservationExpirationService> _logger;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        while (!stoppingToken.IsCancellationRequested)
+        public ReservationExpirationService(IServiceProvider serviceProvider, ILogger<ReservationExpirationService> logger)
         {
-            var now = DateTime.UtcNow;
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+        }
 
-            // Find all cart items with expired reservation times (older than 30 minutes)
-            var expiredCartItems = await _context.CartItems
-                .Where(cartItem => cartItem.AddedAt < now.AddMinutes(-30))
-                .ToListAsync(stoppingToken);
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("ReservationExpirationService started.");
 
-            foreach (var item in expiredCartItems)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                // Return the reserved stock to the product
-                var product = await _context.Produkter.FindAsync(item.ProductId);
-                if (product != null)
+                try
                 {
-                    product.StockLevel += item.Quantity;
-                    _context.CartItems.Remove(item); // Remove expired cart item
+                    _logger.LogInformation("Checking for expired cart items...");
+                    await PerformExpirationLogic(stoppingToken);
+
+                    // Delay between checks (e.g., every 1 minute)
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    _logger.LogInformation("ReservationExpirationService task was canceled.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "An error occurred in the ReservationExpirationService.");
                 }
             }
 
-            await _context.SaveChangesAsync(stoppingToken);
-            await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait 1 minute before checking again
+            _logger.LogInformation("ReservationExpirationService stopped.");
+        }
+
+        private async Task PerformExpirationLogic(CancellationToken stoppingToken)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                var now = DateTime.UtcNow;
+
+                try
+                {
+                    // Find expired cart items
+                    var expiredCartItems = await context.CartItems
+                        .Where(cartItem => cartItem.ExpirationTime <= now)
+                        .ToListAsync(stoppingToken);
+
+                    if (expiredCartItems.Any())
+                    {
+                        _logger.LogInformation($"Found {expiredCartItems.Count} expired cart items.");
+
+                        foreach (var item in expiredCartItems)
+                        {
+                            // Update stock levels for the product
+                            var product = await context.Produkter.FindAsync(item.ProductId);
+                            if (product != null)
+                            {
+                                product.StockLevel += item.Quantity;
+                                _logger.LogInformation($"Updated stock for ProductId {product.ProductId}. Quantity returned: {item.Quantity}");
+                            }
+
+                            // Remove expired cart item
+                            context.CartItems.Remove(item);
+                            _logger.LogInformation($"Removed expired cart item with Id {item.ProductId}.");
+                        }
+
+                        // Save changes to the database
+                        await context.SaveChangesAsync(stoppingToken);
+                        _logger.LogInformation("Expired cart items processed and removed.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error during reservation expiration logic.");
+                }
+            }
         }
     }
-}
 }

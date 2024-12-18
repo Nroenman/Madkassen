@@ -20,7 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-builder.Services.AddScoped<ReservationExpirationService>();
+
+builder.Services.AddHostedService<ReservationExpirationService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,10 +1,9 @@
 using MadkassenRestAPI.Models;
 using MadkassenRestAPI.Services;
-using MadkassenRestAPI.Data;
 using Microsoft.AspNetCore.Mvc;
 using ClassLibrary;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 [ApiController]
@@ -20,25 +19,24 @@ public class CartController : ControllerBase
 
     // Get Cart Items for a specific user
     [HttpGet("get-cart-items")]
-public async Task<IActionResult> GetCartItems(int userId)
-{
-    try
+    public async Task<IActionResult> GetCartItems(int userId)
     {
-        var cartItems = await _cartService.GetCartItemsByUserIdAsync(userId);
-
-        if (cartItems == null || cartItems.Count == 0)
+        try
         {
-            return Ok(new List<CartItemDto>()); // Return empty list if no items
+            var cartItems = await _cartService.GetCartItemsByUserIdAsync(userId);
+
+            if (cartItems == null || cartItems.Count == 0)
+            {
+                return Ok(new List<CartItemDto>()); // Return empty list if no items
+            }
+
+            return Ok(cartItems); // Return cart items including product details
         }
-
-        return Ok(cartItems); // Return cart items including product details
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
     }
-    catch (Exception ex)
-    {
-        return BadRequest($"Error: {ex.Message}");
-    }
-}
-
 
     // Add an item to the cart
     [HttpPost("add-to-cart")]
