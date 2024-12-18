@@ -4,7 +4,7 @@ namespace MadkassenRestAPI.Models
 {
     public class User : Users
     {
-        public string Username { get; set; } = string.Empty;
+      
     }
 
     public class AuthInput

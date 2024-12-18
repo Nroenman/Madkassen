@@ -4,6 +4,7 @@ namespace MadkassenRestAPI.Services
 {
     public interface IUserService
     {
-        User Authenticate(string email, string password);
+        User Authenticate(string email, string password); 
+        User GetUserFromJwtToken(string token); 
     }
 }

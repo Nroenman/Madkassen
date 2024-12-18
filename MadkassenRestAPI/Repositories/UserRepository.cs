@@ -14,7 +14,6 @@ namespace MadkassenRestAPI.Repositories
 
             return new User
             {
-                Username = dbUser.UserName,
                 Email = dbUser.Email,
                 PasswordHash = dbUser.PasswordHash,
                 UserName = dbUser.UserName,

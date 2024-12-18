@@ -31,7 +31,7 @@ namespace MadkassenRestAPI.Controllers
                 var token = JwtBuilder.Create()
                     .WithAlgorithm(new HMACSHA256Algorithm()) 
                     .WithSecret(configuration["AppSettings:Token"]) 
-                    .Subject(user.Username) 
+                    .Subject(user.UserName) 
                     .Issuer(configuration["AppSettings:Issuer"])
                     .Audience(configuration["AppSettings:Audience"])
                     .IssuedAt(DateTimeOffset.Now.DateTime)

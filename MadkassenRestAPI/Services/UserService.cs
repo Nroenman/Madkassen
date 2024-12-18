@@ -1,31 +1,68 @@
-﻿using MadkassenRestAPI.Models;
-using MadkassenRestAPI.Data;
-
+﻿using MadkassenRestAPI.Models; // Import the correct User model
+using MadkassenRestAPI.Data;    // Import the ApplicationDbContext
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 
 namespace MadkassenRestAPI.Services
 {
-    public class UserService(ApplicationDbContext context) : IUserService
+    public class UserService : IUserService
     {
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+
+        public UserService(ApplicationDbContext context, IConfiguration configuration)
+        {
+            _context = context;
+            _configuration = configuration;
+        }
+
         public User Authenticate(string email, string password)
         {
-            var user = context.Users.FirstOrDefault(u => u.Email == email);
-            
-            if (user == null)
+            // Find user by email
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null || user.PasswordHash != password)
             {
-                return null; 
+                return null; // Return null if user doesn't exist or password doesn't match
             }
 
-            if (user.PasswordHash != password)
+            // Map to the MadkassenRestAPI.Models.User
+            return new User
             {
-                return null; 
-            }
+                UserId = user.UserId,
+                UserName = user.UserName,
+                Email = user.Email,
+                Roles = user.Roles,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
+            };
+        }
+
+        public User GetUserFromJwtToken(string token)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+            var jwtToken = jwtHandler.ReadToken(token) as JwtSecurityToken;
+
+            if (jwtToken == null)
+                throw new UnauthorizedAccessException("Invalid token");
+
+            var userName = jwtToken?.Claims?.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+            if (string.IsNullOrEmpty(userName))
+                throw new UnauthorizedAccessException("Invalid token");
+
+            var user = _context.Users.FirstOrDefault(u => u.UserName == userName);
+
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found");
 
             return new User
             {
                 UserId = user.UserId,
-                Username = user.UserName,
+                UserName = user.UserName,
                 Email = user.Email,
-                Roles = user.Roles
+                Roles = user.Roles,
+                CreatedAt = user.CreatedAt,
+                UpdatedAt = user.UpdatedAt
             };
         }
     }
