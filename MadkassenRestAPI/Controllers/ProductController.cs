@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClassLibrary; // Include the namespace where your Produkter and Kategori classes are defined
-using MadkassenRestAPI.Data; // Include the namespace where ApplicationDbContext is located
+using ClassLibrary.Model; 
+using MadkassenRestAPI.Data; 
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -21,9 +21,7 @@ namespace MadkassenRestAPI.Controllers
                     Description = product.Description,
                     Price = product.Price,
                     StockLevel = product.StockLevel,
-                    ImageUrl = string.IsNullOrEmpty(product.ImageUrl)
-                        ? "https://i.imghippo.com/files/KCsO2582jBE.png"
-                        : product.ImageUrl
+                    ImageUrl = product.ComputedImageUrl
                 })
                 .ToListAsync();
 

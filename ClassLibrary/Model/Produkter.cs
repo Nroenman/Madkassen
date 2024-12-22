@@ -1,4 +1,4 @@
-namespace ClassLibrary 
+namespace ClassLibrary.Model 
 {
 
 public enum AllergyType
@@ -22,6 +22,8 @@ public class Produkter
     public double Price { get; set; }
     public int StockLevel { get; set; }
     public string? ImageUrl { get; set; }
+    public string ComputedImageUrl { get; set; }
+
 
     // Default constructor
     public Produkter() { }

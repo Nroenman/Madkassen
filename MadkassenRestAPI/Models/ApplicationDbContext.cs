@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ClassLibrary;
+using ClassLibrary.Model;
 
 namespace MadkassenRestAPI.Data
 {

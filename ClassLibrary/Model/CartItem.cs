@@ -1,3 +1,5 @@
+using ClassLibrary.Model;
+
 namespace ClassLibrary 
 {
 public class CartItem
