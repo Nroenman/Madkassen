@@ -21,45 +21,41 @@ public class CartService
             .FirstOrDefaultAsync(ci => ci.ProductId == productId && ci.UserId == userId);
 
         var product = await _context.Produkter.FindAsync(productId);
-
         if (product == null)
         {
             throw new InvalidOperationException("Product not found.");
         }
-
-        // Ensure there's enough stock to add to the cart
+        // Tjekker om stocklevel er højere end forespørgslen
         if (product.StockLevel < quantity)
         {
             throw new InvalidOperationException("Not enough stock available.");
         }
-
-        // Start a transaction to ensure data consistency
+        // Starter en transaction
         using (var transaction = await _context.Database.BeginTransactionAsync())
         {
             try
             {
                 if (existingCartItem != null)
                 {
-                    // If the product is already in the cart, just update the quantity
+                    // Hvis produktet allerede er i kurven opdateres antallet i stedet for at tilføje på ny
                     existingCartItem.Quantity += quantity;
                     _context.CartItems.Update(existingCartItem);
                 }
                 else
                 {
-                    // If the product isn't in the cart, add a new cart item
+                    // Hvis produktet ikke findes i kurven allerede tilføjes det
                     var cartItem = new CartItem
                     {
                         ProductId = productId,
-                        UserId = userId,  // Nullable for guest users
+                        UserId = userId,
                         Quantity = quantity,
                         AddedAt = DateTime.UtcNow,
-                        ExpirationTime = DateTime.UtcNow.AddMinutes(30)  // Expire after 30 minutes
+                        ExpirationTime = DateTime.UtcNow.AddMinutes(30)  // Reservationen udløber efter 30 minutter
                     };
 
                     _context.CartItems.Add(cartItem);
                 }
-
-                // Decrease the stock level of the product by the quantity added to the cart
+                // Reducerer Stocklevel med det antal som puttes i kurven
                 product.StockLevel -= quantity;
 
                 await _context.SaveChangesAsync();

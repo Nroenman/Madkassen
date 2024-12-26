@@ -33,7 +33,7 @@ namespace MadkassenRestAPI.Services
                     _logger.LogInformation("Checking for expired cart items...");
                     await PerformExpirationLogic(stoppingToken);
 
-                    // Delay between checks (e.g., every 1 minute)
+                    // Tjekker én gang i minuttet for udløbede reservationer
                     await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
                 }
                 catch (TaskCanceledException)
@@ -57,40 +57,50 @@ namespace MadkassenRestAPI.Services
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 var now = DateTime.UtcNow;
 
-                try
+                using (var transaction = await context.Database.BeginTransactionAsync(stoppingToken))
                 {
-                    // Find expired cart items
-                    var expiredCartItems = await context.CartItems
-                        .Where(cartItem => cartItem.ExpirationTime <= now)
-                        .ToListAsync(stoppingToken);
-
-                    if (expiredCartItems.Any())
+                    try
                     {
-                        _logger.LogInformation($"Found {expiredCartItems.Count} expired cart items.");
+                        // Find expired cart items
+                        var expiredCartItems = await context.CartItems
+                            .Where(cartItem => cartItem.ExpirationTime <= now)
+                            .ToListAsync(stoppingToken);
 
-                        foreach (var item in expiredCartItems)
+                        if (expiredCartItems.Any())
                         {
-                            // Update stock levels for the product
-                            var product = await context.Produkter.FindAsync(item.ProductId);
-                            if (product != null)
+                            _logger.LogInformation($"Found {expiredCartItems.Count} expired cart items.");
+
+                            foreach (var item in expiredCartItems)
                             {
-                                product.StockLevel += item.Quantity;
-                                _logger.LogInformation($"Updated stock for ProductId {product.ProductId}. Quantity returned: {item.Quantity}");
+                                // Update stock levels for the product
+                                var product = await context.Produkter.FindAsync(item.ProductId);
+                                if (product != null)
+                                {
+                                    product.StockLevel += item.Quantity;
+                                    _logger.LogInformation($"Updated stock for ProductId {product.ProductId}. Quantity returned: {item.Quantity}");
+                                }
+
+                                // Remove expired cart item
+                                context.CartItems.Remove(item);
+                                _logger.LogInformation($"Removed expired cart item with Id {item.ProductId}.");
                             }
 
-                            // Remove expired cart item
-                            context.CartItems.Remove(item);
-                            _logger.LogInformation($"Removed expired cart item with Id {item.ProductId}.");
-                        }
+                            // Save changes to the database
+                            await context.SaveChangesAsync(stoppingToken);
 
-                        // Save changes to the database
-                        await context.SaveChangesAsync(stoppingToken);
-                        _logger.LogInformation("Expired cart items processed and removed.");
+                            // Commit the transaction
+                            await transaction.CommitAsync(stoppingToken);
+                            _logger.LogInformation("Transaction committed. Expired cart items processed and removed.");
+                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during reservation expiration logic.");
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error during reservation expiration logic.");
+
+                        // Rollback the transaction in case of an error
+                        await transaction.RollbackAsync(stoppingToken);
+                        _logger.LogInformation("Transaction rolled back due to an error.");
+                    }
                 }
             }
         }
