@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: "http://localhost:5092/api/Users",  // Base URL for API
+    baseURL: "http://localhost:5092/api/Users",
     headers: {
         Authorization: `Bearer ${localStorage.getItem('authToken')}`,
     }

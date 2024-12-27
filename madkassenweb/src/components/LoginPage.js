@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import useAuth from '../Hooks/useAuth';
 import logomad from "../images/logomad.png";
 
@@ -32,7 +34,11 @@ const LoginPage = () => {
                         <label htmlFor="email" className="block text-sm font-medium text-gray-900">
                             Email address
                         </label>
-                        <div className="mt-2">
+                        <div className="mt-2 relative">
+                            <FontAwesomeIcon
+                                icon={faEnvelope}
+                                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                            />
                             <input
                                 type="email"
                                 name="email"
@@ -40,7 +46,7 @@ const LoginPage = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                className="block w-full rounded-md bg-white px-10 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
                                 placeholder="Enter your email"
                             />
                         </div>
@@ -71,9 +77,9 @@ const LoginPage = () => {
                             <button
                                 type="button"
                                 onClick={() => setPasswordVisible(!passwordVisible)} // Toggle visibility
-                                className="absolute right-2 top-2 text-sm text-indigo-600"
+                                className="absolute right-3 top-2 text-gray-500"
                             >
-                                {passwordVisible ? "Hide" : "Show"}
+                                <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye} />
                             </button>
                         </div>
                     </div>
