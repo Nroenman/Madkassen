@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import useAuth from '../Hooks/useAuth';
 import logomad from "../images/logomad.png";
+import {Link} from "react-router-dom";
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -98,9 +99,9 @@ const LoginPage = () => {
 
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Ikke en bruger?{' '}
-                    <a href="signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
                         Opret dig her
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>
