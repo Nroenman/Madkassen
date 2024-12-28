@@ -80,5 +80,34 @@ namespace MadkassenRestAPI.Controllers
 
             return Ok(product);
         }
+        // Endpoint to get products by category ID
+        [HttpGet("category/{categoryId}")]
+        public async Task<IActionResult> GetProductsByCategory(int categoryId, int page = 1, int pageSize = 10, string searchQuery = "")
+        {
+            // Check if the categoryId is valid (e.g., greater than 0)
+            if (categoryId <= 0)
+            {
+                return BadRequest(new { message = "Invalid category ID" });
+            }
+
+            var productsQuery = context.Produkter
+                .Where(p => p.CategoryId == categoryId)  // Filter by category
+                .Where(p => string.IsNullOrEmpty(searchQuery) || p.ProductName.Contains(searchQuery)); // Apply search filtering if searchQuery is provided
+    
+            productsQuery = productsQuery.OrderBy(p => p.Price);
+
+            var products = await productsQuery
+                .Skip((page - 1) * pageSize) // Skip products from previous pages
+                .Take(pageSize) // Take the current page size
+                .ToListAsync();
+
+            if (products == null || products.Count == 0)
+            {
+                return NotFound(new { message = "No products found in this category" });
+            }
+
+            // Return the products list with pagination details if necessary
+            return Ok(products);
+        }
     }
 }
