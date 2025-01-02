@@ -4,10 +4,12 @@ import { AppBar, Toolbar, Button } from "@mui/material";
 import thumbnailmad from "../images/thumbnailmad.png";
 import useAuth from "../Hooks/useAuth"; // Import the useAuth hook
 import { useCart } from "../context/CartContext"; // Import the CartContext
+import { Toast } from "flowbite-react"; // Make sure to import Toast from Flowbite
+import { HiCheck } from "react-icons/hi"; // Import the Check icon for Toast
 
 const Navbar = () => {
     const { isAuthenticated, logout } = useAuth(); // Get the authentication status and logout function
-    const { cartItems } = useCart(); // Access cartItems from CartContext
+    const { cartItems, showToast, toastMessage } = useCart(); // Access cartItems and showToast from CartContext
 
     // Calculate total items (considering quantities)
     const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -74,6 +76,19 @@ const Navbar = () => {
                             </span>
                         )}
                     </Link>
+
+                    {/* Toast Notification for adding to cart */}
+                    {showToast && (
+                        <div className="absolute top-12 right-0 z-50">
+                            <Toast>
+                                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
+                                    <HiCheck className="h-5 w-5" />
+                                </div>
+                                <div className="ml-3 text-sm font-normal">{toastMessage}</div>
+                                <Toast.Toggle />
+                            </Toast>
+                        </div>
+                    )}
                 </div>
 
                 {/* Conditionally render Login or Logout button based on authentication */}
@@ -97,8 +112,6 @@ const Navbar = () => {
                         </Button>
                     )}
                 </div>
-
-                
             </Toolbar>
         </AppBar>
     );
