@@ -4,14 +4,22 @@ import { login as apiLogin } from '../Api/Auth';
 
 const useAuth = () => {
     const [error, setError] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
     const navigate = useNavigate();
 
     const login = async (email, password) => {
         try {
-            setError(null);
+            setError(null); // Reset error state
+            setSuccessMessage(null);
             const { token } = await apiLogin(email, password);
-            localStorage.setItem('authToken', token);
-            navigate('/AboutPage');
+
+            if (token) {
+                localStorage.setItem('authToken', token);
+                setSuccessMessage('Login successful!');
+                navigate('/AboutPage');
+            } else {
+                setError('Login failed!');
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -19,15 +27,16 @@ const useAuth = () => {
 
     const logout = () => {
         localStorage.removeItem('authToken');
-        navigate('/login');
+        setSuccessMessage('Logged out successfully!');
+        setTimeout(() => navigate('/login'), 2000);
     };
 
     const isAuthenticated = () => {
         const token = localStorage.getItem('authToken');
-        return Boolean(token);  // Return true if the token exists, otherwise false
+        return Boolean(token);
     };
 
-    return { login, logout, isAuthenticated, error };
+    return { login, logout, isAuthenticated, error, successMessage }; // Return state for successMessage and error
 };
 
 export default useAuth;

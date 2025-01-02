@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import useAuth from '../Hooks/useAuth';
 import logomad from "../images/logomad.png";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import toast, { Toaster } from 'react-hot-toast'; // Importing toast and Toaster
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordVisible, setPasswordVisible] = useState(false); // Added state to toggle password visibility
-    const { login, error } = useAuth();
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const { login, logout, error, successMessage } = useAuth(); // Get successMessage and error from the hook
 
-    const handleSubmit = (e) => {
+    // Triggering toast when successMessage or error changes
+    useEffect(() => {
+        if (successMessage) {
+            toast.success(successMessage); // Show success toast
+        }
+        if (error) {
+            toast.error(error); // Show error toast
+        }
+    }, [successMessage, error]); // Re-run whenever successMessage or error changes
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        login(email, password);
+        login(email, password); // Trigger login function from the custom hook
     };
 
     return (
@@ -66,7 +77,7 @@ const LoginPage = () => {
                         </div>
                         <div className="mt-2 relative">
                             <input
-                                type={passwordVisible ? "text" : "password"} // Toggle between text and password
+                                type={passwordVisible ? "text" : "password"}
                                 name="password"
                                 id="password"
                                 value={password}
@@ -77,7 +88,7 @@ const LoginPage = () => {
                             />
                             <button
                                 type="button"
-                                onClick={() => setPasswordVisible(!passwordVisible)} // Toggle visibility
+                                onClick={() => setPasswordVisible(!passwordVisible)}
                                 className="absolute right-3 top-2 text-gray-500"
                             >
                                 <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye} />
@@ -95,8 +106,6 @@ const LoginPage = () => {
                     </div>
                 </form>
 
-                {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
-
                 <p className="mt-10 text-center text-sm text-gray-500">
                     Ikke en bruger?{' '}
                     <Link to="/signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
@@ -104,6 +113,12 @@ const LoginPage = () => {
                     </Link>
                 </p>
             </div>
+
+            {/* Toaster for displaying toast messages */}
+            <Toaster
+                position="top-right" // Toast will appear in the top-right corner
+                reverseOrder={false} // New toasts will appear above the older ones
+            />
         </div>
     );
 };
