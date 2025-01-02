@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { AppBar, Toolbar, Button } from "@mui/material";
+import React from "react";
+import {Link} from "react-router-dom";
+import {AppBar, Toolbar, Button} from "@mui/material";
 import thumbnailmad from "../images/thumbnailmad.png";
 import useAuth from "../Hooks/useAuth"; // Import the useAuth hook
-import { useCart } from "../context/CartContext"; // Import the CartContext
-import { Toast } from "flowbite-react"; // Make sure to import Toast from Flowbite
-import { HiCheck } from "react-icons/hi"; // Import the Check icon for Toast
+import {useCart} from "../context/CartContext"; // Import the CartContext
+import {Toast} from "flowbite-react"; // Import Toast from Flowbite
+import {HiCheck} from "react-icons/hi"; // Import the Check icon for Toast
 
 const Navbar = () => {
-    const { isAuthenticated, logout } = useAuth(); // Get the authentication status and logout function
-    const { cartItems, showToast, toastMessage } = useCart(); // Access cartItems and showToast from CartContext
+    const {isAuthenticated, logout} = useAuth(); // Get the authentication status and logout function
+    const {cartItems, showToast, toastMessage, toastType} = useCart(); // Access cartItems and showToast from CartContext
 
     // Calculate total items (considering quantities)
     const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -71,21 +71,28 @@ const Navbar = () => {
                             🛒
                         </span>
                         {totalItems > 0 && (
-                            <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -mt-1 -mr-1">
+                            <span
+                                className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -mt-1 -mr-1">
                                 {totalItems}
                             </span>
                         )}
                     </Link>
 
-                    {/* Toast Notification for adding to cart */}
+                    {/* Toast Notification for adding/removing from cart */}
                     {showToast && (
-                        <div className="absolute top-12 right-0 z-50">
+                        <div className="absolute top-14 right-0 z-50">
                             <Toast>
-                                <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
-                                    <HiCheck className="h-5 w-5" />
+                                <div
+                                    className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${
+                                        toastType === "error" ? "bg-red-500" : "bg-green-700"
+                                    } text-white`}
+                                >
+                                    <HiCheck className="h-6 w-6"/> {/* Increased icon size */}
                                 </div>
-                                <div className="ml-3 text-sm font-normal">{toastMessage}</div>
-                                <Toast.Toggle />
+                                <div className="ml-4 text-lg font-normal"> {/* Increased text size */}
+                                    {toastMessage}
+                                </div>
+                                <Toast.Toggle/>
                             </Toast>
                         </div>
                     )}

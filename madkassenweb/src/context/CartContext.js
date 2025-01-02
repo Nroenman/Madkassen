@@ -1,17 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+// Create the CartContext
 const CartContext = createContext();
 
+// Function to generate a random user ID
 const generateRandomUserId = () => {
     return Math.floor(Math.random() * 1000000);
 };
 
+// CartProvider component
 export const CartProvider = ({ children }) => {
-    const [cartItems, setCartItems] = useState([]);
-    const [userId, setUserId] = useState(null);
+    const [cartItems, setCartItems] = useState([]); // Store cart items
+    const [userId, setUserId] = useState(null); // Store user ID
     const [showToast, setShowToast] = useState(false); // Track toast visibility
     const [toastMessage, setToastMessage] = useState(""); // Store the toast message
+    const [toastType, setToastType] = useState(""); // Store toast type (success or error)
 
+    // useEffect to initialize the user ID and cart items from localStorage
     useEffect(() => {
         const storedUserId = JSON.parse(localStorage.getItem("userId"));
         if (storedUserId) {
@@ -26,12 +31,14 @@ export const CartProvider = ({ children }) => {
         setCartItems(storedCartItems);
     }, []);
 
+    // useEffect to store cart items in localStorage whenever they change
     useEffect(() => {
         if (cartItems.length > 0) {
             localStorage.setItem("cartItems", JSON.stringify(cartItems));
         }
     }, [cartItems]);
 
+    // Function to add items to the cart
     const addToCart = async (product, quantity) => {
         if (!userId) {
             console.warn("Cannot add to cart without a userId");
@@ -56,6 +63,7 @@ export const CartProvider = ({ children }) => {
             await fetchCartItems();
             // Show toast notification after adding product to cart
             setToastMessage(`${product.productName} has been added to the cart!`);
+            setToastType("success"); // Indicating a successful operation
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
         } catch (error) {
@@ -63,6 +71,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    // Function to remove an item from the cart
     const removeFromCart = async (productId) => {
         try {
             const response = await fetch(`http://localhost:5092/api/Cart/remove-cart-item?productId=${productId}&userId=${userId}`, {
@@ -75,15 +84,22 @@ export const CartProvider = ({ children }) => {
             }
 
             setCartItems((prevItems) => prevItems.filter((item) => item.productId !== productId));
+
+            setToastMessage("Item has been removed from the cart!");
+            setToastType("error"); // Set to error for removal
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 5000); // Hide toast after 5 seconds
         } catch (error) {
-            console.error(error);
+            console.error('Remove from cart error:', error);
         }
     };
 
+    // Function to calculate the total price of items in the cart
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
     };
 
+    // Function to fetch cart items from the server
     const fetchCartItems = async () => {
         if (!userId) {
             console.warn("Cannot fetch cart items without a userId");
@@ -113,6 +129,7 @@ export const CartProvider = ({ children }) => {
                 fetchCartItems,
                 showToast,
                 toastMessage,
+                toastType,
             }}
         >
             {children}
