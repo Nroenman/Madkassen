@@ -1,18 +1,29 @@
 import React from "react";
-import {Link} from "react-router-dom";
-import {AppBar, Toolbar, Button} from "@mui/material";
+import { Link } from "react-router-dom";
+import { AppBar, Toolbar, Button } from "@mui/material";
 import thumbnailmad from "../images/thumbnailmad.png";
 import useAuth from "../Hooks/useAuth"; // Import the useAuth hook
-import {useCart} from "../context/CartContext"; // Import the CartContext
-import {Toast} from "flowbite-react"; // Import Toast from Flowbite
-import {HiCheck} from "react-icons/hi"; // Import the Check icon for Toast
+import { useCart } from "../context/CartContext"; // Import the CartContext
+import { HiCheck } from "react-icons/hi"; // Import the Check icon for Toast
+import toast, { Toaster } from "react-hot-toast"; // Import toast from react-hot-toast
 
 const Navbar = () => {
-    const {isAuthenticated, logout} = useAuth(); // Get the authentication status and logout function
-    const {cartItems, showToast, toastMessage, toastType} = useCart(); // Access cartItems and showToast from CartContext
+    const { isAuthenticated, logout } = useAuth(); // Get the authentication status and logout function
+    const { cartItems, showToast, toastMessage, toastType } = useCart(); // Access cartItems and showToast from CartContext
 
     // Calculate total items (considering quantities)
     const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+    // Show toast based on type (success or error)
+    React.useEffect(() => {
+        if (showToast) {
+            if (toastType === "success") {
+                toast.success(toastMessage, { duration: 3000, position: 'top-right' }); // Display success message
+            } else if (toastType === "error") {
+                toast.error(toastMessage, { duration: 3000, position: 'top-right' }); // Display error message
+            }
+        }
+    }, [showToast, toastMessage, toastType]);
 
     return (
         <AppBar position="fixed" className="bg-indigo-600 shadow-md">
@@ -77,25 +88,6 @@ const Navbar = () => {
                             </span>
                         )}
                     </Link>
-
-                    {/* Toast Notification for adding/removing from cart */}
-                    {showToast && (
-                        <div className="absolute top-14 right-0 z-50">
-                            <Toast>
-                                <div
-                                    className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${
-                                        toastType === "error" ? "bg-red-500" : "bg-green-700"
-                                    } text-white`}
-                                >
-                                    <HiCheck className="h-6 w-6"/> {/* Increased icon size */}
-                                </div>
-                                <div className="ml-4 text-lg font-normal"> {/* Increased text size */}
-                                    {toastMessage}
-                                </div>
-                                <Toast.Toggle/>
-                            </Toast>
-                        </div>
-                    )}
                 </div>
 
                 {/* Conditionally render Login or Logout button based on authentication */}
@@ -120,6 +112,12 @@ const Navbar = () => {
                     )}
                 </div>
             </Toolbar>
+
+            {/* Toaster component for toast notifications */}
+            <Toaster
+                position="top-right" // Toast will appear in the top-right corner
+                reverseOrder={false} // New toasts will appear above the older ones
+            />
         </AppBar>
     );
 };
