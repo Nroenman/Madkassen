@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { fetchCategories } from "../Api/categoryService";
 
 const useCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -7,18 +6,22 @@ const useCategories = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const loadCategories = async () => {
+        const fetchCategories = async () => {
             try {
-                const data = await fetchCategories();
+                const response = await fetch("http://localhost:5092/api/Category");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch categories");
+                }
+                const data = await response.json();
                 setCategories(data);
             } catch (err) {
-                setError("Something went wrong while fetching the categories.");
+                setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadCategories();
+        fetchCategories();
     }, []);
 
     return { categories, loading, error };

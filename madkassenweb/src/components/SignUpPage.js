@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faEnvelope, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import React, {useState, useEffect} from "react";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEye, faEyeSlash, faEnvelope, faCheck, faTimes} from "@fortawesome/free-solid-svg-icons";
 import logomad from "../images/logomad.png";
 import useRegister from "../Hooks/useRegistrer";
 
@@ -11,7 +11,16 @@ const SignUpPage = () => {
     const [userName, setUserName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const { register, error, validateUserName, validUserName, validateEmail, validEmail, validatePassword, validPassword } = useRegister();
+    const {
+        register,
+        error,
+        validateUserName,
+        validUserName,
+        validateEmail,
+        validEmail,
+        validatePassword,
+        validPassword
+    } = useRegister();
     const [successMessage, setSuccessMessage] = useState('');
 
     useEffect(() => {
@@ -20,7 +29,7 @@ const SignUpPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted:", { email, password, userName });
+        console.log("Form submitted:", {email, password, userName});
 
         const response = await register(email, password, userName);
         if (response) {
@@ -32,7 +41,7 @@ const SignUpPage = () => {
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <img className="mx-auto h-10 w-auto" src={logomad} alt="Madkassen" />
+                <img className="mx-auto h-10 w-auto" src={logomad} alt="Madkassen"/>
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
                     Create Account
                 </h2>
@@ -44,8 +53,10 @@ const SignUpPage = () => {
                     <div>
                         <label htmlFor="userName" className="block text-sm font-medium text-gray-900">
                             Username
-                            <FontAwesomeIcon icon={faCheck} className={validUserName ? "text-green-500 ml-2" : "hidden"} />
-                            <FontAwesomeIcon icon={faTimes} className={!validUserName && userName ? "text-red-500 ml-2" : "hidden"} />
+                            <FontAwesomeIcon icon={faCheck}
+                                             className={validUserName ? "text-green-500 ml-2" : "hidden"}/>
+                            <FontAwesomeIcon icon={faTimes}
+                                             className={!validUserName && userName ? "text-red-500 ml-2" : "hidden"}/>
                         </label>
                         <div className="mt-2">
                             <input
@@ -63,8 +74,12 @@ const SignUpPage = () => {
                         {userName && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={/[A-Z]/.test(userName) ? "text-green-600" : "text-red-600"}>Contains at least 1 uppercase letter.</li>
-                                    <li className={userName.length >= 5 ? "text-green-600" : "text-red-600"}>At least 5 characters long.</li>
+                                    <li className={/[A-Z]/.test(userName) ? "text-green-600" : "text-red-600"}>Contains
+                                        at least 1 uppercase letter.
+                                    </li>
+                                    <li className={userName.length >= 5 ? "text-green-600" : "text-red-600"}>At least 5
+                                        characters long.
+                                    </li>
                                 </ul>
                             </div>
                         )}
@@ -74,9 +89,11 @@ const SignUpPage = () => {
                     <div className="mt-2 relative">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-900">
                             Email
-                            <FontAwesomeIcon icon={faEnvelope} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" />
-                            <FontAwesomeIcon icon={faCheck} className={validEmail ? "text-green-500 ml-2" : "hidden"} />
-                            <FontAwesomeIcon icon={faTimes} className={!validEmail && email ? "text-red-500 ml-2" : "hidden"} />
+                            <FontAwesomeIcon icon={faEnvelope}
+                                             className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10"/>
+                            <FontAwesomeIcon icon={faCheck} className={validEmail ? "text-green-500 ml-2" : "hidden"}/>
+                            <FontAwesomeIcon icon={faTimes}
+                                             className={!validEmail && email ? "text-red-500 ml-2" : "hidden"}/>
                         </label>
                         <div className="mt-2 relative">
                             <input
@@ -95,7 +112,9 @@ const SignUpPage = () => {
                         {email && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={validEmail ? "text-green-600" : "text-red-600"}>Must include an "@" and a ".".</li>
+                                    <li className={validEmail ? "text-green-600" : "text-red-600"}>Must include an "@"
+                                        and a ".".
+                                    </li>
                                 </ul>
                             </div>
                         )}
@@ -124,16 +143,24 @@ const SignUpPage = () => {
                                 className="absolute inset-y-0 right-3 flex items-center text-gray-500"
                                 onClick={() => setShowPassword((prev) => !prev)}
                             >
-                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye}/>
                             </button>
                         </div>
                         {password && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={password.length >= 8 ? "text-green-600" : "text-red-600"}>At least 8 characters long.</li>
-                                    <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-600"}>Contains at least 1 uppercase letter.</li>
-                                    <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-600"}>Contains at least 1 number.</li>
-                                    <li className={/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "text-green-600" : "text-red-600"}>Contains at least 1 special character.</li>
+                                    <li className={password.length >= 8 ? "text-green-600" : "text-red-600"}>At least 8
+                                        characters long.
+                                    </li>
+                                    <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
+                                        at least 1 uppercase letter.
+                                    </li>
+                                    <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
+                                        at least 1 number.
+                                    </li>
+                                    <li className={/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
+                                        at least 1 special character.
+                                    </li>
                                 </ul>
                             </div>
                         )}
@@ -159,7 +186,7 @@ const SignUpPage = () => {
                                 className="absolute inset-y-0 right-3 flex items-center text-gray-500"
                                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                             >
-                                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye} />
+                                <FontAwesomeIcon icon={showConfirmPassword ? faEyeSlash : faEye}/>
                             </button>
                         </div>
                     </div>

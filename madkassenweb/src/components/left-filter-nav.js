@@ -1,13 +1,24 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { Drawer, List, ListItem, ListItemText } from "@mui/material";
+import useCategories from "../Hooks/useCategories"; // Import the custom hook
 
-const LeftFilterNav = () => {
+const LeftFilterNav = ({ setCategoryId }) => {
     const location = useLocation();
     const shouldShowSidebar = location.pathname === "/productlist";
 
+    const { categories, loading, error } = useCategories();
+
     if (!shouldShowSidebar) {
         return null;
+    }
+
+    if (loading) {
+        return <div>Loading filters...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading filters: {error}</div>;
     }
 
     return (
@@ -25,15 +36,18 @@ const LeftFilterNav = () => {
             }}
         >
             <List>
-                <ListItem button>
-                    <ListItemText primary="Filter 1" />
+                <ListItem button onClick={() => setCategoryId(null)}>
+                    <ListItemText primary="All Products" />
                 </ListItem>
-                <ListItem button>
-                    <ListItemText primary="Filter 2" />
-                </ListItem>
-                <ListItem button>
-                    <ListItemText primary="Filter 3" />
-                </ListItem>
+                {categories.map((category) => (
+                    <ListItem
+                        button
+                        key={category.categoryId}
+                        onClick={() => setCategoryId(category.categoryId)}
+                    >
+                        <ListItemText primary={category.categoryName} />
+                    </ListItem>
+                ))}
             </List>
         </Drawer>
     );

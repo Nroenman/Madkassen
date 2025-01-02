@@ -24,10 +24,7 @@ const App = () => {
                 {/* Top Navbar */}
                 <Navbar />
 
-                {/* Main Content Area */}
-                <div style={{ display: "flex", marginTop: "64px" }}> {/* Adjust for Navbar height */}
-                    {/* Left Sidebar */}
-                    <LeftFilterNav />
+
 
                     {/* Main Content */}
                     <div style={{ flex: 1, padding: "16px" }}>
@@ -43,7 +40,6 @@ const App = () => {
                             <Route path="/cart" element={<Cart />} />
 
                         </Routes>
-                    </div>
                 </div>
             </div>
         </Router>
