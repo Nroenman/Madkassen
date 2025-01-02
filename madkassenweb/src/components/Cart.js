@@ -32,7 +32,6 @@ const Cart = () => {
                             <th className="py-3 px-6 text-sm font-medium text-gray-600">Price</th>
                             <th className="py-3 px-6 text-sm font-medium text-gray-600">Quantity</th>
                             <th className="py-3 px-6 text-sm font-medium text-gray-600">Total</th>
-                            <th className="py-3 px-6 text-sm font-medium text-gray-600">Actions</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -1,16 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar"; // Top Navbar
-import LeftFilterNav from "./components/left-filter-nav"; // Left Sidebar
 import HomePage from "./components/HomePage";
 import AboutPage from "./components/AboutPage";
 import Profile from "./components/Profile";
 import ProductList from "./components/ProductList";
 import ProductDetails from "./components/productDetails";
-import CategoryList from "./components/CategoryList";
 import LoginPage from "./components/LoginPage";
 import "./index.css";
-import signUpPage from "./components/SignUpPage";
 import SignUpPage from "./components/SignUpPage";
 import { CartProvider } from "./context/CartContext";
 import Cart from "./components/Cart";
@@ -34,7 +31,6 @@ const App = () => {
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/productlist" element={<ProductList />} />
                             <Route path="/products/:id" element={<ProductDetails />} />
-                            <Route path="/categorylist" element={<CategoryList />} />
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/signup" element={<SignUpPage />} />
                             <Route path="/cart" element={<Cart />} />
