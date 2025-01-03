@@ -5,22 +5,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using ClassLibrary.Model;
 using ClassLibrary;
+using JWT.Algorithms;
+using JWT.Builder;
 
 namespace MadkassenRestAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(ApplicationDbContext context, IConfiguration configuration) : ControllerBase
     {
-        private readonly ApplicationDbContext context;
-        private readonly IConfiguration configuration;
-
-        public UsersController(ApplicationDbContext context, IConfiguration configuration)
-        {
-            this.context = context;
-            this.configuration = configuration;
-        }
-
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Users>>> GetAllUsers()
@@ -65,66 +58,40 @@ namespace MadkassenRestAPI.Controllers
             return Ok(user);
         }
 
-        // POST: api/Users
-        [HttpPost]
-        public async Task<ActionResult<Users>> CreateUser(Users user)
-        {
-            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email) ||
-                string.IsNullOrEmpty(user.PasswordHash))
-            {
-                return BadRequest("UserName, Email, and Password are required.");
-            }
-
-            var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            if (existingUser != null)
-            {
-                return BadRequest("Email is already in use.");
-            }
-
-            user.CreatedAt = DateTime.UtcNow;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                user.UserName = user.Email;
-            }
-
-            user.PasswordHash = HashPassword(user.PasswordHash);
-
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
-        }
-
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUserProfileRequest updateRequest)
         {
+            // Extract token from authorization header
             var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
             if (string.IsNullOrEmpty(token))
             {
                 return Unauthorized(new { Message = "No token provided." });
             }
 
+            // Get user details from the token
             var userProfile = await GetUserProfileFromToken(token);
             if (userProfile == null)
             {
                 return Unauthorized(new { Message = "Invalid or expired token." });
             }
 
+            // Fetch user from the database
             var user = await context.Users.FindAsync(int.Parse(userProfile.UserId));
             if (user == null)
             {
                 return NotFound(new { Message = "User not found." });
             }
 
-            if (!string.IsNullOrEmpty(updateRequest.UserName) && updateRequest.UserName != user.UserName)
+            // Only update if new value is not the placeholder "string"
+            if (!string.IsNullOrEmpty(updateRequest.UserName) && updateRequest.UserName != "string" &&
+                updateRequest.UserName != user.UserName)
             {
                 user.UserName = updateRequest.UserName;
             }
 
-            if (!string.IsNullOrEmpty(updateRequest.Email) && updateRequest.Email != user.Email &&
-                updateRequest.Email != "string")
+            // Check if the email is being updated
+            if (!string.IsNullOrEmpty(updateRequest.Email) && updateRequest.Email != "string" &&
+                updateRequest.Email != user.Email)
             {
                 var existingUserWithEmail =
                     await context.Users.FirstOrDefaultAsync(u => u.Email == updateRequest.Email);
@@ -136,6 +103,7 @@ namespace MadkassenRestAPI.Controllers
                 user.Email = updateRequest.Email;
             }
 
+            // Handle password update
             if (!string.IsNullOrEmpty(updateRequest.OldPassword) && updateRequest.OldPassword != "string")
             {
                 if (!VerifyPassword(updateRequest.OldPassword, user.PasswordHash))
@@ -144,16 +112,39 @@ namespace MadkassenRestAPI.Controllers
                 }
             }
 
-            if (!string.IsNullOrEmpty(updateRequest.NewPassword))
+            if (!string.IsNullOrEmpty(updateRequest.NewPassword) && updateRequest.NewPassword != "string")
             {
                 user.PasswordHash = HashPassword(updateRequest.NewPassword);
             }
 
+            // If nothing was updated, return a message saying that
+            if (updateRequest.UserName == "string" && updateRequest.Email == "string" &&
+                updateRequest.OldPassword == "string" && updateRequest.NewPassword == "string")
+            {
+                return BadRequest(new { Message = "No valid data provided to update." });
+            }
+
+            // Update the timestamp for last modification
             user.UpdatedAt = DateTime.UtcNow;
 
+            // Save changes to the database
             await context.SaveChangesAsync();
 
-            return Ok(new { Message = "Profile updated successfully." });
+            // Optionally, generate a new JWT token (if the user has updated their profile and you want to issue a new token)
+            var newToken = JwtBuilder.Create()
+                .WithAlgorithm(new HMACSHA256Algorithm())
+                .WithSecret(configuration["AppSettings:Token"])
+                .Subject(user.UserId.ToString())
+                .Issuer(configuration["AppSettings:Issuer"])
+                .Audience(configuration["AppSettings:Audience"])
+                .IssuedAt(DateTimeOffset.Now.DateTime)
+                .ExpirationTime(DateTimeOffset.Now.AddHours(1).DateTime)
+                .NotBefore(DateTimeOffset.Now.DateTime)
+                .Id(Guid.NewGuid().ToString())
+                .Encode();
+
+            // Return a success message with the new token
+            return Ok(new { Message = "Profile updated successfully.", Token = newToken });
         }
 
 
