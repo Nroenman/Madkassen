@@ -1,30 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import React, {useState, useEffect} from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faEnvelope, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
 import useAuth from '../Hooks/useAuth';
 import logomad from "../images/logomad.png";
-import { Link } from "react-router-dom";
-import toast, { Toaster } from 'react-hot-toast'; // Importing toast and Toaster
+import {Link} from "react-router-dom";
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const { login, logout, error, successMessage } = useAuth(); // Get successMessage and error from the hook
 
-    // Triggering toast when successMessage or error changes
+    const {login, error, successMessage} = useAuth();
+
+
+
     useEffect(() => {
         if (successMessage) {
-            toast.success(successMessage); // Show success toast
+            toast.success(successMessage);
         }
         if (error) {
-            toast.error(error); // Show error toast
+            toast.error(error);
         }
-    }, [successMessage, error]); // Re-run whenever successMessage or error changes
+    }, [successMessage, error]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        login(email, password); // Trigger login function from the custom hook
+        login(email, password);
     };
 
     return (
@@ -65,16 +67,9 @@ const LoginPage = () => {
                     </div>
 
                     <div>
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-900">
-                                Password
-                            </label>
-                            <div className="text-sm">
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                    Forgot password?
-                                </a>
-                            </div>
-                        </div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+                            Password
+                        </label>
                         <div className="mt-2 relative">
                             <input
                                 type={passwordVisible ? "text" : "password"}
@@ -91,7 +86,7 @@ const LoginPage = () => {
                                 onClick={() => setPasswordVisible(!passwordVisible)}
                                 className="absolute right-3 top-2 text-gray-500"
                             >
-                                <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye} />
+                                <FontAwesomeIcon icon={passwordVisible ? faEyeSlash : faEye}/>
                             </button>
                         </div>
                     </div>
@@ -114,11 +109,7 @@ const LoginPage = () => {
                 </p>
             </div>
 
-            {/* Toaster for displaying toast messages */}
-            <Toaster
-                position="top-right" // Toast will appear in the top-right corner
-                reverseOrder={false} // New toasts will appear above the older ones
-            />
+
         </div>
     );
 };
