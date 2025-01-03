@@ -61,7 +61,7 @@ const ProductDetails = () => {
                         <p className="text-sm text-gray-700">
                             Allergier:{" "}
                             {product.allergies ? (
-                                product.allergyType ? (
+                                product.allergyType !== null && product.allergyType !== undefined ? (
                                     allergyTypeNames[product.allergyType] || "Ukendt Allergi"
                                 ) : (
                                     "Ukendt Allergi"
@@ -70,6 +70,7 @@ const ProductDetails = () => {
                                 "Nej"
                             )}
                         </p>
+
                         <div className="flex items-center gap-2">
                             <input
                                 type="number"

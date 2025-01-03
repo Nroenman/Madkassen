@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ClassLibrary.Model; 
-using MadkassenRestAPI.Data; 
+using ClassLibrary.Model;
+using MadkassenRestAPI.Data;
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -19,6 +19,9 @@ namespace MadkassenRestAPI.Controllers
                     ProductId = product.ProductId,
                     ProductName = product.ProductName,
                     Description = product.Description,
+                    CategoryId = product.CategoryId,
+                    Allergies = product.Allergies,
+                    AllergyType = product.AllergyType,
                     Price = product.Price,
                     StockLevel = product.StockLevel,
                     ImageUrl = product.ComputedImageUrl
@@ -92,7 +95,7 @@ namespace MadkassenRestAPI.Controllers
 
             var productsQuery = context.Produkter
                 .Where(p => p.CategoryId == categoryId); // Filter by category
-    
+
             productsQuery = productsQuery.OrderBy(p => p.Price);
 
             var products = await productsQuery

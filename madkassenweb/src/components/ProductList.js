@@ -77,18 +77,19 @@ const ProductList = ({ initialCategoryId = null }) => {
                                 <p className="mt-1 text-sm text-gray-700">{product.description}</p>
                                 <p className="mt-1 text-lg font-medium text-gray-900">${product.price}</p>
                                 <p className="mt-1 text-sm text-gray-700">Stock: {product.stockLevel}</p>
-                                <p className="mt-1 text-sm text-gray-700">
-                                    Allergier:{" "}
-                                    {product.allergies ? (
-                                        product.allergyType ? (
-                                            allergyTypeNames[product.allergyType] || "Ukendt Allergi"
-                                        ) : (
-                                            "Ukendt Allergi"
-                                        )
-                                    ) : (
-                                        "Nej"
-                                    )}
-                                </p>
+                                <p className="text-sm text-gray-700">
+    Allergier:{" "}
+    {product.allergies ? (
+        product.allergyType !== null && product.allergyType !== undefined ? (
+            allergyTypeNames[product.allergyType] || "Ukendt Allergi"
+        ) : (
+            "Ukendt Allergi"
+        )
+    ) : (
+        "Nej"
+    )}
+</p>
+
                             </Link>
                         ))
                     )}
