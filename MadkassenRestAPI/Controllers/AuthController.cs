@@ -3,9 +3,7 @@ using JWT.Builder;
 using MadkassenRestAPI.Models;
 using MadkassenRestAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Http;
-using System;
+
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -27,11 +25,11 @@ namespace MadkassenRestAPI.Controllers
                     return Unauthorized(new { Message = "Incorrect email or password." });
                 }
 
-                // Generate JWT token
+                // Generate JWT token with user ID as string
                 var token = JwtBuilder.Create()
                     .WithAlgorithm(new HMACSHA256Algorithm()) 
                     .WithSecret(configuration["AppSettings:Token"]) 
-                    .Subject(user.UserName) 
+                    .Subject(user.UserId.ToString())
                     .Issuer(configuration["AppSettings:Issuer"])
                     .Audience(configuration["AppSettings:Audience"])
                     .IssuedAt(DateTimeOffset.Now.DateTime)

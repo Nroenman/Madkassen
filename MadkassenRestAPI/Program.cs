@@ -70,18 +70,17 @@ builder.Services.AddAuthentication("Bearer")
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,  // Ensure the signature is valid
-            ValidateAudience = true,          // Validate the Audience claim in the token
-            ValidateIssuer = true,            // Validate the Issuer claim in the token
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)),  // Secret key used for token validation
-            ValidAudience = builder.Configuration["AppSettings:Audience"],  // Expected Audience (ensure this matches the "aud" in the token)
-            ValidIssuer = builder.Configuration["AppSettings:Issuer"]       // Expected Issuer (ensure this matches the "iss" in the token)
+            ValidateIssuerSigningKey = true,  
+            ValidateAudience = true,          
+            ValidateIssuer = true,          
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]!)), 
+            ValidAudience = builder.Configuration["AppSettings:Audience"],
+            ValidIssuer = builder.Configuration["AppSettings:Issuer"] 
         };
     });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
