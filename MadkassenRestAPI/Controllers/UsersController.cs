@@ -7,6 +7,7 @@ using ClassLibrary.Model;
 using ClassLibrary;
 using JWT.Algorithms;
 using JWT.Builder;
+using MadkassenRestAPI.Models;
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -217,6 +218,46 @@ namespace MadkassenRestAPI.Controllers
             {
                 return null;
             }
+        }
+        [HttpPost]
+        public async Task<ActionResult<User>> CreateUser(User user)
+        {
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                return BadRequest("UserName is required.");
+            }
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                return BadRequest("Email is required.");
+            }
+
+            if (string.IsNullOrEmpty(user.PasswordHash))
+            {
+                return BadRequest("Password is required.");
+            }
+
+            var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (existingUser != null)
+            {
+                return BadRequest("Email is already in use.");
+            }
+
+            user.CreatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                user.UserName = user.Email;
+            }
+
+            // Hash password using BCrypt
+            user.PasswordHash = HashPassword(user.PasswordHash);
+
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
         }
 
         private string HashPassword(string password)
