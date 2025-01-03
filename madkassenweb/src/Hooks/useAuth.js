@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login as apiLogin } from '../Api/Auth';
-
+import { jwtDecode } from "jwt-decode";
 const useAuth = () => {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
@@ -36,7 +36,16 @@ const useAuth = () => {
         return Boolean(token);
     };
 
-    return { login, logout, isAuthenticated, error, successMessage }; // Return state for successMessage and error
+    const getUserInfo = () => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            return decodedToken.sub;
+        }
+        return null;
+    };
+
+    return { login, logout, isAuthenticated, error, successMessage, getUserInfo };
 };
 
 export default useAuth;

@@ -1,24 +1,39 @@
-﻿using MadkassenRestAPI.Services;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MadkassenRestAPI.Middleware;
 
-public class JwtMiddleware(RequestDelegate next, ILogger<JwtMiddleware> logger)
+public class JwtMiddleware(RequestDelegate next, IConfiguration configuration)
 {
-    public async Task InvokeAsync(HttpContext context, IUserService userService)
+    public async Task Invoke(HttpContext context)
     {
-        var token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
-        if (!string.IsNullOrEmpty(token))
+        if (token != null)
         {
             try
             {
-                var user = userService.GetUserFromJwtToken(token);
-                context.Items["User"] = user;
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = System.Text.Encoding.ASCII.GetBytes(configuration["AppSettings:Token"]);
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = configuration["AppSettings:Issuer"],
+                    ValidAudience = configuration["AppSettings:Audience"],
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var username = jwtToken.Claims.First(x => x.Type == "sub").Value;
+
+                context.Items["User"] = username;
             }
-            catch (Exception ex)
+            catch
             {
-                logger.LogError(ex, "An error occurred while processing the JWT token.");
-                // Optionally, add response to indicate failure (e.g., 401 Unauthorized)
+                // Token validation failed, user is not authenticated
             }
         }
 

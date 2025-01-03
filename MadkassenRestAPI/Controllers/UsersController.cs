@@ -8,8 +8,15 @@ namespace MadkassenRestAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController(ApplicationDbContext context) : ControllerBase
+    public class UsersController : ControllerBase
     {
+        private readonly ApplicationDbContext context;
+
+        public UsersController(ApplicationDbContext context)
+        {
+            this.context = context;
+        }
+
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
@@ -125,7 +132,7 @@ namespace MadkassenRestAPI.Controllers
                     user.Email = updateData.Email;
 
                 if (!string.IsNullOrEmpty(updateData.PasswordHash))
-                    user.PasswordHash = HashPassword(updateData.PasswordHash); // Hashing password using BCrypt before saving
+                    user.PasswordHash = HashPassword(updateData.PasswordHash); // Hashing password before saving
 
                 user.UpdatedAt = DateTime.UtcNow;
 
@@ -141,7 +148,7 @@ namespace MadkassenRestAPI.Controllers
 
         private string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password); // Using BCrypt for password hashing
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
     }
 }
