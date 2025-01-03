@@ -12,7 +12,6 @@ const Navbar = () => {
 
     const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
-    // Get the logged-in user's username
     const userName = getUserInfo();
 
     return (
@@ -26,10 +25,6 @@ const Navbar = () => {
                 />
 
                 <div className="flex space-x-6">
-                    <Button color="inherit" component={Link} to="/categoryList"
-                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
-                        Kategorier
-                    </Button>
                     <Button color="inherit" component={Link} to="/productlist"
                             className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
                         Produkter
@@ -60,9 +55,7 @@ const Navbar = () => {
 
                 <div className="flex space-x-4">
                     {/* Show Username if authenticated */}
-                    {isAuthenticated() && userName && (
-                        <span className="text-white font-semibold">{userName}</span>
-                    )}
+                    {isAuthenticated() && userName }
 
                     {/* Show Login or Logout button */}
                     {!isAuthenticated() ? (
