@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import useUserUpdate from '../Hooks/useUserUpdate';
+import useAuth from '../Hooks/useAuth';
 
 const UserProfileForm = () => {
     const { updateUserProfile, loading, error } = useUserUpdate();
+    const { getUserInfo, userInfo } = useAuth();
     const [formData, setFormData] = useState({
         userName: '',
         email: '',
         password: ''
     });
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const info = await getUserInfo();
+            if (info) {
+                setFormData({
+                    userName: info.userName || '',  // Populate username
+                    email: info.email || '',        // Populate email
+                    password: ''
+                });
+            }
+        };
+        fetchUserInfo();
+    }, [getUserInfo]); // Re-run this effect whenever getUserInfo changes
 
     const handleChange = (e) => {
         const { name, value } = e.target;

@@ -1,42 +1,53 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 
-namespace MadkassenRestAPI.Middleware;
-
-public class JwtMiddleware(RequestDelegate next, IConfiguration configuration)
+namespace MadkassenRestAPI.Middleware
 {
-    public async Task Invoke(HttpContext context)
+    public class JwtMiddleware(RequestDelegate next, IConfiguration configuration, ILogger<JwtMiddleware> logger)
     {
-        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-        if (token != null)
+        public async Task Invoke(HttpContext context)
         {
-            try
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            if (!string.IsNullOrEmpty(token))
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = System.Text.Encoding.ASCII.GetBytes(configuration["AppSettings:Token"]);
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                try
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidIssuer = configuration["AppSettings:Issuer"],
-                    ValidAudience = configuration["AppSettings:Audience"],
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = System.Text.Encoding.ASCII.GetBytes(configuration["AppSettings:Token"]);
 
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var username = jwtToken.Claims.First(x => x.Type == "sub").Value;
+                    var validationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidIssuer = configuration["AppSettings:Issuer"],
+                        ValidAudience = configuration["AppSettings:Audience"],
+                        ClockSkew = TimeSpan.Zero // No tolerance for clock skew
+                    };
 
-                context.Items["User"] = username;
+                    var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                    var userId = principal.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+
+                    if (userId != null)
+                    {
+                        context.Items["User"] = userId;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"JWT Token validation failed: {ex.Message}");
+                }
             }
-            catch
+            else
             {
-                // Token validation failed, user is not authenticated
+                // Log if no token was provided
+                logger.LogWarning("No token provided in request.");
             }
-        }
 
-        await next(context);
+            // Proceed with the next middleware
+            await next(context);
+        }
     }
 }
