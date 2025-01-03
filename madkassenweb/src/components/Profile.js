@@ -1,42 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import useUserUpdate from '../Hooks/useUserUpdate';
-import useAuth from '../Hooks/useAuth';
+import useUserUpdate from "../Hooks/useUserUpdate";
+import useAuth from "../Hooks/useAuth";
 
 const UserProfileForm = () => {
     const { updateUserProfile, loading, error } = useUserUpdate();
-    const { getUserInfo, userInfo } = useAuth();
+    const { userInfo, loading: authLoading } = useAuth();
     const [formData, setFormData] = useState({
         userName: '',
         email: '',
-        password: ''
+        password: '',
+        oldPassword: '',
+        newPassword: ''
     });
 
     useEffect(() => {
-        const fetchUserInfo = async () => {
-            const info = await getUserInfo();
-            if (info) {
-                setFormData({
-                    userName: info.userName || '',  // Populate username
-                    email: info.email || '',        // Populate email
-                    password: ''
-                });
-            }
-        };
-        fetchUserInfo();
-    }, [getUserInfo]); // Re-run this effect whenever getUserInfo changes
+        if (!authLoading && userInfo) {
+            // Prepopulate form fields with user info once available
+            setFormData({
+                userName: userInfo.userName || '',
+                email: userInfo.email || '',
+                password: '',
+                oldPassword: '',
+                newPassword: ''
+            });
+        }
+    }, [authLoading, userInfo]); // Re-run effect when userInfo is available
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await updateUserProfile(formData);
+
+        // Validate input and ensure oldPassword is provided if changing password
+        if (formData.newPassword && !formData.oldPassword) {
+            alert('Please provide your old password to change the password.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You are not authenticated!');
+            return;
+        }
+
+        try {
+            const response = await updateUserProfile(formData, token);
+            console.log('Profile updated successfully:', response);
+        } catch (err) {
+            console.error('Error updating profile:', err);
+        }
     };
+
+    if (authLoading) {
+        return <p>Loading profile...</p>;
+    }
 
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100">
@@ -48,6 +71,7 @@ const UserProfileForm = () => {
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Username Field */}
                     <div>
                         <label htmlFor="userName" className="block text-sm font-medium text-gray-900">
                             Username
@@ -65,6 +89,7 @@ const UserProfileForm = () => {
                         </div>
                     </div>
 
+                    {/* Email Field */}
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-gray-900">
                             Email
@@ -82,23 +107,43 @@ const UserProfileForm = () => {
                         </div>
                     </div>
 
+                    {/* Old Password Field */}
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-900">
-                            Password
+                        <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-900">
+                            Old Password
                         </label>
                         <div className="mt-2">
                             <input
                                 type="password"
-                                name="password"
-                                id="password"
-                                value={formData.password}
+                                name="oldPassword"
+                                id="oldPassword"
+                                value={formData.oldPassword}
                                 onChange={handleChange}
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter new password"
+                                placeholder="Enter your old password"
                             />
                         </div>
                     </div>
 
+                    {/* New Password Field */}
+                    <div>
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-900">
+                            New Password
+                        </label>
+                        <div className="mt-2">
+                            <input
+                                type="password"
+                                name="newPassword"
+                                id="newPassword"
+                                value={formData.newPassword}
+                                onChange={handleChange}
+                                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                placeholder="Enter your new password"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Submit Button */}
                     <div>
                         <button
                             type="submit"
@@ -110,6 +155,7 @@ const UserProfileForm = () => {
                     </div>
                 </form>
 
+                {/* Error Message */}
                 {error && (
                     <p className="mt-4 text-red-500 text-center">{error}</p>
                 )}
