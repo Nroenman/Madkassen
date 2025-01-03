@@ -69,7 +69,8 @@ namespace MadkassenRestAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> CreateUser(Users user)
         {
-            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.PasswordHash))
+            if (string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Email) ||
+                string.IsNullOrEmpty(user.PasswordHash))
             {
                 return BadRequest("UserName, Email, and Password are required.");
             }
@@ -96,47 +97,65 @@ namespace MadkassenRestAPI.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id = user.UserId }, user);
         }
 
-        // PUT: api/Users/update-profile
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateUserProfileRequest updateRequest)
         {
-            var userId = HttpContext.Items["User"]?.ToString(); // Get the user ID from the token
-
-            if (string.IsNullOrEmpty(userId))
+            var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized();
+                return Unauthorized(new { Message = "No token provided." });
             }
 
-            var user = await context.Users.FindAsync(int.Parse(userId));
+            var userProfile = await GetUserProfileFromToken(token);
+            if (userProfile == null)
+            {
+                return Unauthorized(new { Message = "Invalid or expired token." });
+            }
 
+            var user = await context.Users.FindAsync(int.Parse(userProfile.UserId));
             if (user == null)
             {
-                return NotFound(); 
+                return NotFound(new { Message = "User not found." });
             }
 
-            // Check if the old password matches the stored password hash
-            if (!string.IsNullOrEmpty(updateRequest.OldPassword) && !VerifyPassword(updateRequest.OldPassword, user.PasswordHash))
+            if (!string.IsNullOrEmpty(updateRequest.UserName) && updateRequest.UserName != user.UserName)
             {
-                return BadRequest("Incorrect old password.");
+                user.UserName = updateRequest.UserName;
             }
 
-            // Update the user's email if a new one is provided and it's different
-            if (!string.IsNullOrEmpty(updateRequest.Email) && updateRequest.Email != user.Email)
+            if (!string.IsNullOrEmpty(updateRequest.Email) && updateRequest.Email != user.Email &&
+                updateRequest.Email != "string")
             {
+                var existingUserWithEmail =
+                    await context.Users.FirstOrDefaultAsync(u => u.Email == updateRequest.Email);
+                if (existingUserWithEmail != null)
+                {
+                    return BadRequest(new { Message = "Email is already in use." });
+                }
+
                 user.Email = updateRequest.Email;
             }
 
-            // If a new password is provided, update it
-            if (!string.IsNullOrEmpty(updateRequest.NewPassword))
+            if (!string.IsNullOrEmpty(updateRequest.OldPassword) && updateRequest.OldPassword != "string")
             {
-                user.PasswordHash = HashPassword(updateRequest.NewPassword); // Hash the new password before saving
+                if (!VerifyPassword(updateRequest.OldPassword, user.PasswordHash))
+                {
+                    return BadRequest(new { Message = "Incorrect old password." });
+                }
             }
 
-            user.UpdatedAt = DateTime.UtcNow; // Set the updated timestamp
-            await context.SaveChangesAsync(); // Save the changes to the database
+            if (!string.IsNullOrEmpty(updateRequest.NewPassword))
+            {
+                user.PasswordHash = HashPassword(updateRequest.NewPassword);
+            }
 
-            return Ok(new { message = "Profile updated successfully." });
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await context.SaveChangesAsync();
+
+            return Ok(new { Message = "Profile updated successfully." });
         }
+
 
         // GET: api/Users/profile
         [HttpGet("profile")]
@@ -186,7 +205,7 @@ namespace MadkassenRestAPI.Controllers
         private async Task<UserProfile> GetUserProfileFromToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-    
+
             try
             {
                 var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
@@ -200,18 +219,18 @@ namespace MadkassenRestAPI.Controllers
 
                 return new UserProfile
                 {
-                    UserId = userId 
+                    UserId = userId
                 };
             }
             catch (Exception)
             {
-                return null; 
+                return null;
             }
         }
 
         private string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password); 
+            return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
         private bool VerifyPassword(string password, string hash)
