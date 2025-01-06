@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // Correct import for jwt-decode
+import { jwtDecode } from "jwt-decode";
 
 // Create the context
 const CartContext = createContext();
@@ -27,23 +27,25 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // Load cart items and determine userId on component mount
-    useEffect(() => {
-        // Prioritize userId from token if available
-        let storedUserId = getUserIdFromToken();
+     useEffect(() => {
+        // Only proceed if userId is not set
+        if (userId === null) {
+            // Prioritize userId from token if available
+            let storedUserId = getUserIdFromToken();
 
-        // Fallback to random userId if no valid token
-        if (!storedUserId) {
-            storedUserId = JSON.parse(localStorage.getItem("userId")) || generateRandomUserId();
-            localStorage.setItem("userId", JSON.stringify(storedUserId));
+            // Fallback to random userId if no valid token
+            if (!storedUserId) {
+                storedUserId = JSON.parse(localStorage.getItem("userId")) || generateRandomUserId();
+                localStorage.setItem("userId", JSON.stringify(storedUserId));
+            }
+
+            setUserId(storedUserId);
         }
-
-        setUserId(storedUserId);
 
         // Load cart items from localStorage
         const storedCartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
         setCartItems(storedCartItems);
-    }, []);
+    }, [userId]); // Added userId as a dependency to prevent multiple requests
 
     // Update localStorage whenever cartItems change
     useEffect(() => {
