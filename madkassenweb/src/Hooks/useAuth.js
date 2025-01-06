@@ -1,7 +1,8 @@
-import {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {jwtDecode} from "jwt-decode";
-import { login as apiLogin } from '../Api/Auth'
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login as apiLogin } from '../Api/Auth'; // Import login API function
+import { fetchUserProfile } from '../Api/userUpdate';
+import {jwtDecode} from "jwt-decode"; // Import centralized API call
 
 const useAuth = () => {
     const [error, setError] = useState(null);
@@ -16,7 +17,7 @@ const useAuth = () => {
             setSuccessMessage(null); // Reset success message state
             setLoading(true); // Start loading
 
-            const {token} = await apiLogin(email, password);
+            const { token } = await apiLogin(email, password); // Centralized API call
             if (token) {
                 localStorage.setItem('authToken', token);
                 setSuccessMessage('Login successful!');
@@ -35,35 +36,17 @@ const useAuth = () => {
     const fetchUserProfileFromToken = async (token) => {
         try {
             const decodedToken = jwtDecode(token);
-            const userProfile = await fetchUserProfile(decodedToken.sub, token);
+            if (!decodedToken || !decodedToken.sub) {
+                throw new Error('Invalid token structure');
+            }
+            const userProfile = await fetchUserProfile(token); // Reuse centralized function
             setUserInfo(userProfile);
         } catch (error) {
+            console.error('Error fetching user profile:', error.message);
             setError('Failed to fetch user profile');
         }
     };
 
-    const fetchUserProfile = async (userId, token) => {
-        try {
-            const response = await fetch('/api/Users/profile', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch user profile');
-            }
-
-            const data = await response.json(); // Parse JSON response
-            return data; // Return user profile data
-        } catch (error) {
-            setError('Failed to fetch user profile');
-            throw error;
-        }
-    };
-
-    // Logout function
     const logout = () => {
         localStorage.removeItem('authToken'); // Remove token on logout
         setSuccessMessage('Logged out successfully!');
@@ -71,22 +54,21 @@ const useAuth = () => {
         setTimeout(() => navigate('/login'))
     };
 
-    // Check if user is authenticated
     const isAuthenticated = () => {
         const token = localStorage.getItem('authToken');
         return Boolean(token);
     };
 
-    // Get the current user information
     const getUserInfo = () => {
         return userInfo; // Return user profile info
     };
 
-    // Check if the user is authenticated on component mount (initial load)
     useEffect(() => {
         const token = localStorage.getItem('authToken');
         if (token) {
-            fetchUserProfileFromToken(token); // If token exists, fetch profile
+            fetchUserProfileFromToken(token).catch(err => {
+                console.error('Failed to fetch profile on mount:', err.message);
+            });
         }
     }, []);
 
@@ -98,7 +80,7 @@ const useAuth = () => {
         successMessage,
         getUserInfo,
         loading,
-        userInfo
+        userInfo,
     };
 };
 

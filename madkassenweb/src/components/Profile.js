@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import useUserUpdate from "../Hooks/useUserUpdate";
 import useAuth from "../Hooks/useAuth";
 
 const UserProfileForm = () => {
-    const { updateUserProfile, loading, error } = useUserUpdate();
-    const { userInfo, loading: authLoading } = useAuth();
+    const {updateUserProfile, loading, error} = useUserUpdate();
+    const {userInfo, loading: authLoading} = useAuth();
     const [formData, setFormData] = useState({
         userName: '',
         email: '',
@@ -15,7 +15,6 @@ const UserProfileForm = () => {
 
     useEffect(() => {
         if (!authLoading && userInfo) {
-            // Prepopulate form fields with user info once available
             setFormData({
                 userName: userInfo.userName || '',
                 email: userInfo.email || '',
@@ -27,7 +26,7 @@ const UserProfileForm = () => {
     }, [authLoading, userInfo]); // Re-run effect when userInfo is available
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -37,13 +36,12 @@ const UserProfileForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate input and ensure oldPassword is provided if changing password
         if (formData.newPassword && !formData.oldPassword) {
             alert('Please provide your old password to change the password.');
             return;
         }
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken'); // Correct key
         if (!token) {
             alert('You are not authenticated!');
             return;
@@ -52,8 +50,11 @@ const UserProfileForm = () => {
         try {
             const response = await updateUserProfile(formData, token);
             console.log('Profile updated successfully:', response);
+            alert('Profile updated successfully!');
+            // Optionally, update userInfo in useAuth if necessary
         } catch (err) {
-            console.error('Error updating profile:', err);
+            console.error('Error updating profile:', err.message);
+            alert('Error updating profile: ' + err.message);
         }
     };
 
@@ -162,6 +163,7 @@ const UserProfileForm = () => {
             </div>
         </div>
     );
+
 };
 
 export default UserProfileForm;
