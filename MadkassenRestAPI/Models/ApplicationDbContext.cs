@@ -12,6 +12,8 @@ namespace MadkassenRestAPI.Data
         public DbSet<Kategori> Kategori { get; set; }
         public DbSet<Users> Users {get; set;}
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
        protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,6 +131,88 @@ modelBuilder.Entity<CartItem>()
     .HasOne(c => c.Users)  // Link CartItem to Users (foreign key relationship)
     .WithMany()  // A User can have many CartItems
     .HasForeignKey(c => c.UserId);  // Foreign key is UserId
+
+modelBuilder.Entity<Order>()
+    .HasKey(o => o.OrderId);  // Define the primary key for Orders
+
+modelBuilder.Entity<Order>()
+    .Property(o => o.OrderId)
+    .HasColumnName("OrderId")
+    .ValueGeneratedOnAdd();  // Automatically generate the OrderId
+
+modelBuilder.Entity<Order>()
+    .Property(o => o.UserId)
+    .HasColumnName("UserId")
+    .IsRequired();  // UserId is required for linking to Users
+
+modelBuilder.Entity<Order>()
+    .Property(o => o.OrderDate)
+    .HasColumnName("OrderDate")
+    .HasColumnType("datetime2")
+    .HasDefaultValueSql("GETDATE()")  // Default value for OrderDate
+    .IsRequired();  // OrderDate is required
+
+modelBuilder.Entity<Order>()
+    .Property(o => o.OrderStatus)
+    .HasColumnName("OrderStatus")
+    .HasMaxLength(50)
+    .HasDefaultValue("Pending")  // Default value for OrderStatus
+    .IsRequired();  // OrderStatus is required
+
+modelBuilder.Entity<Order>()
+    .Property(o => o.TotalAmount)
+    .HasColumnName("TotalAmount")
+    .HasColumnType("decimal(18,2)")
+    .IsRequired();  // TotalAmount is required
+
+// Define the relationship between Orders and OrderItems (1-to-many)
+modelBuilder.Entity<Order>()
+    .HasMany(o => o.OrderItems)  // One Order can have many OrderItems
+    .WithOne(oi => oi.Order)  // Each OrderItem is associated with one Order
+    .HasForeignKey(oi => oi.OrderId);  // Foreign key to Order
+
+
+modelBuilder.Entity<OrderItem>()
+    .HasKey(oi => oi.OrderItemId);  // Define the primary key for OrderItem
+
+modelBuilder.Entity<OrderItem>()
+    .Property(oi => oi.OrderItemId)
+    .HasColumnName("OrderItemId")
+    .ValueGeneratedOnAdd();  // Automatically generate the OrderItemId
+
+modelBuilder.Entity<OrderItem>()
+    .Property(oi => oi.OrderId)
+    .HasColumnName("OrderId")
+    .IsRequired();  // OrderId is required
+
+modelBuilder.Entity<OrderItem>()
+    .Property(oi => oi.ProductId)
+    .HasColumnName("ProductId")
+    .IsRequired();  // ProductId is required
+
+modelBuilder.Entity<OrderItem>()
+    .Property(oi => oi.Quantity)
+    .HasColumnName("Quantity")
+    .IsRequired();  // Quantity is required
+
+modelBuilder.Entity<OrderItem>()
+    .Property(oi => oi.Price)
+    .HasColumnName("Price")
+    .HasColumnType("decimal(18,2)")
+    .IsRequired();  // Price is required
+
+// Define the relationship between OrderItems and Produkter (many-to-1)
+modelBuilder.Entity<OrderItem>()
+    .HasOne(oi => oi.Produkter)  // Each OrderItem is linked to one Product
+    .WithMany()  // A Product can be associated with many OrderItems
+    .HasForeignKey(oi => oi.ProductId);  // Foreign key is ProductId
+
+// Define the relationship between Orders and Users (many-to-1)
+modelBuilder.Entity<Order>()
+    .HasOne(o => o.Users)  // Each Order is linked to one User
+    .WithMany()  // A User can have many Orders
+    .HasForeignKey(o => o.UserId);  // Foreign key is UserId
+
     }
     }
 }
