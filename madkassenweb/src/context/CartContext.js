@@ -54,6 +54,8 @@ export const CartProvider = ({ children }) => {
         }
     }, [cartItems]);
 
+    
+
     // Add product to cart
     const addToCart = async (product, quantity) => {
         if (!userId) {
@@ -156,12 +158,18 @@ export const CartProvider = ({ children }) => {
             console.warn("Cannot fetch cart items without a userId");
             return;
         }
-
+    
         try {
             const response = await fetch(`http://localhost:5092/api/Cart/get-cart-items?userId=${userId}`);
             if (response.ok) {
                 const data = await response.json();
-                setCartItems(data);
+                console.log('Cart items received:', data);
+                setCartItems((prevItems) => {
+                    if (JSON.stringify(prevItems) !== JSON.stringify(data)) {
+                        return data;
+                    }
+                    return prevItems; // Avoid unnecessary state updates
+                });
             } else {
                 console.error("Failed to fetch cart items");
             }
