@@ -39,7 +39,7 @@ const useAuth = () => {
             if (!decodedToken || !decodedToken.sub) {
                 throw new Error('Invalid token structure');
             }
-            const userProfile = await fetchUserProfile(token); // Reuse centralized function
+            const userProfile = await fetchUserProfile(token);
             setUserInfo(userProfile);
         } catch (error) {
             console.error('Error fetching user profile:', error.message);
