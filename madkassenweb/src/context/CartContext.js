@@ -15,7 +15,7 @@ export const CartProvider = ({ children }) => {
 
     // Helper function to get userId from JWT token
     const getUserIdFromToken = () => {
-        const token = localStorage.getItem("authToken"); // Assuming the JWT is stored in localStorage
+        const token = localStorage.getItem("authToken");
         if (!token) return null;
 
         try {

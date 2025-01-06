@@ -22,6 +22,7 @@ const useAuth = () => {
                 localStorage.setItem('authToken', token);
                 setSuccessMessage('Login successful!');
                 await fetchUserProfileFromToken(token);
+                localStorage.removeItem("userId")
                 navigate('/AboutPage');
             } else {
                 setError('Login failed!');
