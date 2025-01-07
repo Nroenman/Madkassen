@@ -27,7 +27,7 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-     useEffect(() => {
+    useEffect(() => {
         // Only proceed if userId is not set
         if (userId === null) {
             // Prioritize userId from token if available
@@ -53,8 +53,6 @@ export const CartProvider = ({ children }) => {
             localStorage.setItem("cartItems", JSON.stringify(cartItems));
         }
     }, [cartItems]);
-
-    
 
     // Add product to cart
     const addToCart = async (product, quantity) => {
@@ -158,7 +156,7 @@ export const CartProvider = ({ children }) => {
             console.warn("Cannot fetch cart items without a userId");
             return;
         }
-    
+
         try {
             const response = await fetch(`http://localhost:5092/api/Cart/get-cart-items?userId=${userId}`);
             if (response.ok) {
@@ -178,6 +176,45 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const handleCheckout = async () => {
+        const token = localStorage.getItem("authToken");  // Retrieve the JWT token from localStorage
+        if (!token) {
+            alert("You must be logged in to proceed with checkout.");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5092/api/Order/checkout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,  // Send the JWT token in the Authorization header
+                },
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log("Order successful:", responseData); // Log the success response
+
+                // If the order is successful, show a confirmation message
+                alert(`Checkout successful! Your order ID is ${responseData.orderId}.`);
+
+                // Clear the cart and local storage after a successful checkout
+                setCartItems([]);
+                localStorage.removeItem("cartItems");
+                // Optionally, you can also clear the user ID and other session data if needed
+            } else {
+                const errorDetails = await response.json();
+                console.error("API response error:", errorDetails);
+                alert(`Error during checkout: ${errorDetails.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error("Error during checkout:", error);
+            alert("An error occurred while completing your checkout.");
+        }
+    };
+
+
     return (
         <CartContext.Provider
             value={{
@@ -187,6 +224,7 @@ export const CartProvider = ({ children }) => {
                 removeFromCart,
                 calculateTotal,
                 fetchCartItems,
+                handleCheckout,
             }}
         >
             {children}
