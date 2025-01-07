@@ -62,4 +62,41 @@ public class OrderService
         // Return the newly created OrderId
         return orderId;
     }
+
+    public async Task<List<ProductSummary>> GetTopProductsByUserAsync(int userId, int days)
+{
+    var fromDate = DateTime.UtcNow.AddDays(-days);
+
+    return await _context.OrderItems
+        .Where(oi => oi.Order.OrderDate >= fromDate && oi.Order.UserId == userId)
+        .GroupBy(oi => new { oi.ProductId, oi.ProductName })
+        .Select(group => new ProductSummary
+        {
+            ProductId = group.Key.ProductId,
+            ProductName = group.Key.ProductName,
+            TotalQuantity = group.Sum(g => g.Quantity)
+        })
+        .OrderByDescending(ps => ps.TotalQuantity)
+        .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
+        .ToListAsync();
+}
+
+public async Task<List<ProductSummary>> GetTopProductsOverallAsync(int days)
+{
+    var fromDate = DateTime.UtcNow.AddDays(-days);
+
+    return await _context.OrderItems
+        .Where(oi => oi.Order.OrderDate >= fromDate)
+        .GroupBy(oi => new { oi.ProductId, oi.ProductName })
+        .Select(group => new ProductSummary
+        {
+            ProductId = group.Key.ProductId,
+            ProductName = group.Key.ProductName,
+            TotalQuantity = group.Sum(g => g.Quantity)
+        })
+        .OrderByDescending(ps => ps.TotalQuantity)
+        .Take(5) // Limit to top 5 products
+        .ToListAsync();
+}
+
 }

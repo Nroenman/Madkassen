@@ -49,6 +49,53 @@ namespace MadkassenRestAPI.Controllers
             }
         }
 
+        [HttpGet("TopProductsByUser")]
+public async Task<IActionResult> GetTopProductsByUser()
+{
+    try
+    {
+        var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        if (string.IsNullOrEmpty(token))
+        {
+            _logger.LogWarning("No token provided.");
+            return Unauthorized(new { Message = "No token provided." });
+        }
+
+        var userProfile = await GetUserProfileFromToken(token);
+        if (userProfile == null)
+        {
+            _logger.LogWarning("Invalid or expired token.");
+            return Unauthorized(new { Message = "Invalid or expired token." });
+        }
+
+        var userId = int.Parse(userProfile.UserId);
+        var products = await _orderService.GetTopProductsByUserAsync(userId, 30);
+
+        return Ok(products);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error fetching top products by user: {ex.Message}", ex);
+        return BadRequest(new { Message = "Error: " + ex.Message });
+    }
+}
+
+[HttpGet("TopProductsOverall")]
+public async Task<IActionResult> GetTopProductsOverall()
+{
+    try
+    {
+        var products = await _orderService.GetTopProductsOverallAsync(30);
+        return Ok(products);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError($"Error fetching top products overall: {ex.Message}", ex);
+        return BadRequest(new { Message = "Error: " + ex.Message });
+    }
+}
+
+
 
         private async Task<UserProfile> GetUserProfileFromToken(string token)
         {
