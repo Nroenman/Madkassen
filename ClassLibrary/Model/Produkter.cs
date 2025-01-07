@@ -19,7 +19,7 @@ public class Produkter
     public int CategoryId { get; set; }
     public bool Allergies { get; set; }
     public AllergyType? AllergyType { get; set; }
-    public double Price { get; set; }
+    public decimal Price { get; set; }
     public int StockLevel { get; set; }
     public string? ImageUrl { get; set; }
     public string ComputedImageUrl { get; set; }
@@ -29,7 +29,7 @@ public class Produkter
     public Produkter() { }
 
     // Parameterized constructor for easier object creation
-    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType? allergyType, double price, int stockLevel, string imageUrl)
+    public Produkter(int productId, string productName, string description, int categoryId, bool allergies, AllergyType? allergyType, decimal price, int stockLevel, string imageUrl)
     {
         ProductId = productId;
         ProductName = productName;
