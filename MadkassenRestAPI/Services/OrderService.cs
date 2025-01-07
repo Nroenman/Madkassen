@@ -13,10 +13,10 @@ public class OrderService
 
     public async Task<int> CreateOrderAsync(int userId)
     {
-        // Step 1: Get cart items for the user
+        // Step 1: Get cart items for the user, including the ProductName
         var cartItems = await _context.CartItems
             .Where(ci => ci.UserId == userId)
-            .Include(ci => ci.Produkter)
+            .Include(ci => ci.Produkter)  // Ensure Product information (including ProductName) is loaded
             .ToListAsync();
 
         if (cartItems.Count == 0)
@@ -48,7 +48,8 @@ public class OrderService
             OrderId = orderId,
             ProductId = ci.ProductId,
             Quantity = ci.Quantity,
-            Price = ci.Produkter.Price
+            Price = ci.Produkter.Price,
+            ProductName = ci.Produkter.ProductName  // Ensure ProductName is set correctly
         }).ToList();
 
         _context.OrderItems.AddRange(orderItems);

@@ -134,6 +134,7 @@ public class CartService
                 ProductId = ci.ProductId,
                 UserId = ci.UserId,
                 Quantity = ci.Quantity,
+                ProductName = ci.Produkter.ProductName,
                 Price = (decimal)ci.Produkter.Price,
             })
             .ToListAsync();

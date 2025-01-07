@@ -201,13 +201,11 @@ modelBuilder.Entity<OrderItem>()
     .HasColumnType("decimal(18,2)")
     .IsRequired();  // Price is required
 
-// Define the relationship between OrderItems and Produkter (many-to-1)
 modelBuilder.Entity<OrderItem>()
-    .HasOne(oi => oi.Produkter)  // Each OrderItem is linked to one Product
+    .HasOne(oi => oi.Produkter)  
     .WithMany()  // A Product can be associated with many OrderItems
     .HasForeignKey(oi => oi.ProductId);  // Foreign key is ProductId
 
-// Define the relationship between Orders and Users (many-to-1)
 modelBuilder.Entity<Order>()
     .HasOne(o => o.Users)  // Each Order is linked to one User
     .WithMany()  // A User can have many Orders
