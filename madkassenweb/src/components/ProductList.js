@@ -1,12 +1,12 @@
-import React, {useState, useEffect, useRef} from "react";
-import {Link} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import useProducts from "../Hooks/useProducts";
 import useProductsByCategory from "../Hooks/useProductsByCategory";
 import useMostPurchasedProducts from "../Hooks/useMostPurchasedProducts";
 import LeftFilterNav from "./left-filter-nav";
 
-const ScrollableRow = ({title, products}) => {
-    const containerRef = useRef(null);
+const ScrollableRow = ({ title, products }) => {
+    const containerRef = React.useRef(null);
 
     const handleScroll = (direction) => {
         const container = containerRef.current;
@@ -14,12 +14,11 @@ const ScrollableRow = ({title, products}) => {
 
         const scrollAmount = 300; // Adjust as needed
         if (direction === "left") {
-            container.scrollBy({left: -scrollAmount, behavior: "smooth"});
+            container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
         } else {
-            container.scrollBy({left: scrollAmount, behavior: "smooth"});
+            container.scrollBy({ left: scrollAmount, behavior: "smooth" });
         }
     };
-
 
     return (
         <div className="mb-8">
@@ -45,7 +44,11 @@ const ScrollableRow = ({title, products}) => {
                 <div
                     ref={containerRef}
                     className="flex overflow-x-auto space-x-4"
-                    style={{scrollSnapType: "x mandatory", msOverflowStyle: "none", scrollbarWidth: "none"}}
+                    style={{
+                        scrollSnapType: "x mandatory",
+                        msOverflowStyle: "none",
+                        scrollbarWidth: "none",
+                    }}
                 >
                     {products.map((product) => (
                         <Link
@@ -67,82 +70,97 @@ const ScrollableRow = ({title, products}) => {
     );
 };
 
-const ProductList = ({initialCategoryId = null, userId}) => {
-    const [categoryId, setCategoryId] = useState(initialCategoryId);
-    const [products, setProducts] = useState([]);
+const ProductList = ({ userId }) => {
+    const [categoryId, setCategoryId] = useState(null); // Set categoryId as null initially
+    const [selectedAllergies, setSelectedAllergies] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const {products: allProducts, loading: allLoading, error: allError} = useProducts();
-    const {products: categoryProducts, loading: categoryLoading, error: categoryError, noProducts} =
+    const { products: allProducts, loading: allLoading, error: allError } = useProducts();
+    const { products: categoryProducts, loading: categoryLoading, error: categoryError, noProducts } =
         useProductsByCategory(categoryId);
+    const { mostPurchased } = useMostPurchasedProducts(userId);
 
-    const {mostPurchased} = useMostPurchasedProducts(userId);
+    // Filter user popular products by category
+    const filteredUserProducts = mostPurchased.userProducts.filter((product) => {
+        if (!categoryId) return true; // If no category selected, return all user products
+        return product.categoryId === categoryId; // Filter by selected category
+    });
 
+    // Ensure overall popular products are being fetched and rendered
+    const overallProducts = mostPurchased.overallProducts.length > 0 ? mostPurchased.overallProducts : [];
+
+    // Reset to "All Products" on page load
+    useEffect(() => {
+        setCategoryId(null); // Reset categoryId to null for "All Products"
+    }, []);
+
+    // Update the products whenever category or allergy changes
     useEffect(() => {
         if (categoryId) {
-            setProducts(categoryProducts);
             setLoading(categoryLoading);
             setError(categoryError);
+            setFilteredProducts(categoryProducts);
         } else {
-            setProducts(allProducts);
             setLoading(allLoading);
             setError(allError);
+            setFilteredProducts(allProducts);
         }
     }, [categoryId, allProducts, categoryProducts, allLoading, categoryLoading, allError, categoryError]);
 
-    // Handle loading state
+    useEffect(() => {
+        if (selectedAllergies.length === 0) {
+            setFilteredProducts(categoryId ? categoryProducts : allProducts);
+        } else {
+            const filtered = (categoryId ? categoryProducts : allProducts).filter((product) => {
+                if (!product.allergies) return true; // Include products without allergies
+                return !selectedAllergies.includes(product.allergyType);
+            });
+            setFilteredProducts(filtered);
+        }
+    }, [selectedAllergies, categoryId, categoryProducts, allProducts]);
+
     if (loading) {
         return <div>Loading products...</div>;
     }
 
-    // Handle error state
     if (error) {
         return <div>{error}</div>;
     }
 
-    const allergyTypeNames = {
-        0: "Gluten",
-        1: "Laktose",
-        2: "Nødder",
-        3: "Skaldyr",
-        4: "Soya",
-        5: "Æg",
-    };
-
     return (
         <div className="flex">
-            {/* Sidebar is always visible */}
-            <LeftFilterNav setCategoryId={setCategoryId}/>
+            <LeftFilterNav setCategoryId={setCategoryId} setSelectedAllergies={setSelectedAllergies} selectedAllergies={selectedAllergies} />
 
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-                <h2 className="sr-only">Products</h2>
+                <h2 className="sr-only">Produkter</h2>
 
-                {/* Scrollable Rows */}
-                {mostPurchased.userProducts.length > 0 && (
-                    <ScrollableRow title="Dine mest købte produkter" products={mostPurchased.userProducts}/>
+                {/* Show popular product rows only when no category is selected */}
+                {categoryId ? null : filteredUserProducts.length > 0 && (
+                    <ScrollableRow title="Dine mest købte produkter" products={filteredUserProducts} />
                 )}
-                {mostPurchased.overallProducts.length > 0 && (
-                    <ScrollableRow title="De mest populære produkter blandt andre"
-                                   products={mostPurchased.overallProducts}/>
+                {categoryId ? null : overallProducts.length > 0 && (
+                    <ScrollableRow
+                        title="De mest populære produkter blandt andre"
+                        products={overallProducts}
+                    />
                 )}
 
-                {/* If no products are found for the category, display message */}
                 {categoryId && noProducts && (
                     <div className="text-center text-xl text-red-500 mb-4">
-                        No products available for this category.
+                        Ingen produkter tilgængelige under denne kategori.
                     </div>
                 )}
 
                 {/* Product Grid */}
-                <div
-                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 xl:gap-x-8">
-                    {products.length === 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 xl:gap-x-8">
+                    {filteredProducts.length === 0 ? (
                         <div className="col-span-full text-center text-lg text-gray-500">
-                            No products to display.
+                            Ingen produkter at fremvise.
                         </div>
                     ) : (
-                        products.map((product) => (
+                        filteredProducts.map((product) => (
                             <Link key={product.productId} to={`/products/${product.productId}`} className="group">
                                 <img
                                     src={product.imageUrl}
@@ -151,7 +169,6 @@ const ProductList = ({initialCategoryId = null, userId}) => {
                                 />
                                 <h3 className="mt-4 text-sm text-gray-700">{product.productName}</h3>
                                 <p className="mt-1 text-lg font-medium text-gray-900">{product.price} DKK</p>
-
                             </Link>
                         ))
                     )}

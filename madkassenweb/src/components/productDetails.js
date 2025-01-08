@@ -60,7 +60,7 @@ const ProductDetails = () => {
 
                         <div className="mt-6 space-y-4">
                             <p className="text-base text-gray-700">{product.description}</p>
-                            <p className="text-sm text-gray-700">Stock: {product.stockLevel}</p>
+                            <p className="text-sm text-gray-700">Lagerantal: {product.stockLevel}</p>
                         </div>
 
                         {/* Quantity & Add to Cart */}
@@ -76,7 +76,7 @@ const ProductDetails = () => {
                                 onClick={handleAddToCart}
                                 className="flex-1 rounded-md bg-indigo-600 px-4 py-3 text-white font-bold hover:bg-indigo-700"
                             >
-                                Add to Basket
+                                Tilføj til kurv
                             </button>
                             <button
                                 className="ml-4 flex items-center justify-center rounded-md px-3 py-3 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
@@ -88,14 +88,14 @@ const ProductDetails = () => {
 
                         <section aria-labelledby="details-heading" className="mt-12">
                             <h2 id="details-heading" className="sr-only">
-                                Additional details
+                                Yderligere informationer
                             </h2>
                             <div className="divide-y divide-gray-200 border-t">
                                 <Disclosure>
                                     <DisclosureButton
                                         className="group relative flex w-full items-center justify-between py-6 text-left">
                                         <span className="text-sm font-medium text-gray-900 group-open:text-indigo-600">
-                                            Allergies
+                                            Allergener
                                         </span>
                                         <span className="ml-6 flex items-center">
                                             <PlusIcon
@@ -112,8 +112,8 @@ const ProductDetails = () => {
                                         <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">
                                             <li>
                                                 {allergyTypeNames[product.allergyType]
-                                                    ? `Dette product indeholder ${allergyTypeNames[product.allergyType]}`
-                                                    : "Dette product indeholder ingen kendte allergener"}
+                                                    ? `Dette produkt indeholder ${allergyTypeNames[product.allergyType]}`
+                                                    : "Dette produkt indeholder ingen kendte allergener"}
                                             </li>
                                         </ul>
                                     </DisclosurePanel>
