@@ -7,7 +7,7 @@ import {
     Disclosure,
     DisclosureButton,
     DisclosurePanel,
-} from "@headlessui/react";  // <-- Added this line
+} from "@headlessui/react";
 const allergyTypeNames = {
     0: "Gluten",
     1: "Laktose",
@@ -45,7 +45,6 @@ const ProductDetails = () => {
         <div className="bg-gray-50 min-h-screen flex items-center justify-center">
             <div className="border-2 border-black rounded-lg bg-white shadow-lg p-6 max-w-4xl w-full">
                 <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
-                    {/* Main Image (Only the big image will remain here) */}
                     <div className="mt-6 w-full max-w-2xl sm:block lg:max-w-none">
                         <img
                             alt={product.productName}
@@ -57,7 +56,7 @@ const ProductDetails = () => {
                     {/* Product Info */}
                     <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
                         <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.productName}</h1>
-                        <p className="text-xl font-semibold text-gray-900 mt-2">${product.price}</p>
+                        <p className="text-xl font-semibold text-gray-900 mt-2">{product.price}Kr</p>
 
                         <div className="mt-6 space-y-4">
                             <p className="text-base text-gray-700">{product.description}</p>
