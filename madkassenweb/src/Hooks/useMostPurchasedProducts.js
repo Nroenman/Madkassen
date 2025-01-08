@@ -12,7 +12,7 @@ const useMostPurchasedProducts = (userId) => {
     useEffect(() => {
         const getMostPurchasedProducts = async () => {
             try {
-                const userProducts = userId ? await fetchUserMostPurchasedProducts(userId) : [];
+                const userProducts =  await fetchUserMostPurchasedProducts();
                 const overallProducts = await fetchMostPurchasedProducts();
 
                 setMostPurchased({
