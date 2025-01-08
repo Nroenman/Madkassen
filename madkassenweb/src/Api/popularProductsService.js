@@ -8,14 +8,17 @@ const getAuthToken = () => {
 };
 
 // Fetch most purchased products for a specific user in the last 30 days
-export const fetchUserMostPurchasedProducts = async (userId) => {
+export const fetchUserMostPurchasedProducts = async () => {
     try {
         const token = getAuthToken(); // Get the token
-        const response = await axios.get(`${API_URL}/most-purchased/${userId}`, {
+        const response = await axios.get(`${API_URL}/TopProductsByUser`, {
             headers: {
                 Authorization: `Bearer ${token}`, // Include the token in the request headers
             },
         });
+        console.log("Headers sent:", {
+    Authorization: `Bearer ${token}`,
+});
         return response.data;
     } catch (error) {
         console.error("Error fetching user most purchased products:", error);
@@ -27,7 +30,7 @@ export const fetchUserMostPurchasedProducts = async (userId) => {
 export const fetchMostPurchasedProducts = async () => {
     try {
         const token = getAuthToken(); // Get the token
-        const response = await axios.get(`${API_URL}/most-purchased`, {
+        const response = await axios.get(`${API_URL}/TopProductsOverall`, {
             headers: {
                 Authorization: `Bearer ${token}`, // Include the token in the request headers
             },
