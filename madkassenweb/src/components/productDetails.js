@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, {useState} from "react";
+import {useParams} from "react-router-dom";
 import useProducts from "../Hooks/useProducts";
-import { useCart } from "../context/CartContext";
-import { HeartIcon, MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import {useCart} from "../context/CartContext";
+import {HeartIcon, MinusIcon, PlusIcon} from "@heroicons/react/24/outline";
 import {
     Disclosure,
     DisclosureButton,
@@ -18,9 +18,9 @@ const allergyTypeNames = {
 };
 
 const ProductDetails = () => {
-    const { id } = useParams();
-    const { products, loading, error } = useProducts();
-    const { addToCart } = useCart();
+    const {id} = useParams();
+    const {products, loading, error} = useProducts();
+    const {addToCart} = useCart();
     const [quantity, setQuantity] = useState(1);
 
     if (loading) {
@@ -62,9 +62,6 @@ const ProductDetails = () => {
                         <div className="mt-6 space-y-4">
                             <p className="text-base text-gray-700">{product.description}</p>
                             <p className="text-sm text-gray-700">Stock: {product.stockLevel}</p>
-                            <p className="text-sm text-gray-700">
-                                Allergies: {allergyTypeNames[product.allergyType] || "None"}
-                            </p>
                         </div>
 
                         {/* Quantity & Add to Cart */}
@@ -85,7 +82,7 @@ const ProductDetails = () => {
                             <button
                                 className="ml-4 flex items-center justify-center rounded-md px-3 py-3 text-gray-400 hover:bg-gray-100 hover:text-gray-500"
                             >
-                                <HeartIcon className="h-6 w-6" aria-hidden="true" />
+                                <HeartIcon className="h-6 w-6" aria-hidden="true"/>
                                 <span className="sr-only">Add to Favorites</span>
                             </button>
                         </div>
@@ -96,9 +93,10 @@ const ProductDetails = () => {
                             </h2>
                             <div className="divide-y divide-gray-200 border-t">
                                 <Disclosure>
-                                    <DisclosureButton className="group relative flex w-full items-center justify-between py-6 text-left">
+                                    <DisclosureButton
+                                        className="group relative flex w-full items-center justify-between py-6 text-left">
                                         <span className="text-sm font-medium text-gray-900 group-open:text-indigo-600">
-                                            Features
+                                            Allergies
                                         </span>
                                         <span className="ml-6 flex items-center">
                                             <PlusIcon
@@ -113,8 +111,11 @@ const ProductDetails = () => {
                                     </DisclosureButton>
                                     <DisclosurePanel className="pb-6">
                                         <ul className="list-disc space-y-1 pl-5 text-sm text-gray-700">
-                                            <li>Feature 1</li>
-                                            <li>Feature 2</li>
+                                            <li>
+                                                {allergyTypeNames[product.allergyType]
+                                                    ? `Dette product indeholder ${allergyTypeNames[product.allergyType]}`
+                                                    : "Dette product indeholder ingen kendte allergener"}
+                                            </li>
                                         </ul>
                                     </DisclosurePanel>
                                 </Disclosure>

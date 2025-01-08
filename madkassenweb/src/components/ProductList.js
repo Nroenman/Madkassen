@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, {useState, useEffect, useRef} from "react";
+import {Link} from "react-router-dom";
 import useProducts from "../Hooks/useProducts";
 import useProductsByCategory from "../Hooks/useProductsByCategory";
 import useMostPurchasedProducts from "../Hooks/useMostPurchasedProducts";
 import LeftFilterNav from "./left-filter-nav";
 
-const ScrollableRow = ({ title, products }) => {
+const ScrollableRow = ({title, products}) => {
     const containerRef = useRef(null);
 
     const handleScroll = (direction) => {
@@ -14,12 +14,12 @@ const ScrollableRow = ({ title, products }) => {
 
         const scrollAmount = 300; // Adjust as needed
         if (direction === "left") {
-            container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+            container.scrollBy({left: -scrollAmount, behavior: "smooth"});
         } else {
-            container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+            container.scrollBy({left: scrollAmount, behavior: "smooth"});
         }
     };
-    
+
 
     return (
         <div className="mb-8">
@@ -45,7 +45,7 @@ const ScrollableRow = ({ title, products }) => {
                 <div
                     ref={containerRef}
                     className="flex overflow-x-auto space-x-4"
-                    style={{ scrollSnapType: "x mandatory", msOverflowStyle: "none", scrollbarWidth: "none" }}
+                    style={{scrollSnapType: "x mandatory", msOverflowStyle: "none", scrollbarWidth: "none"}}
                 >
                     {products.map((product) => (
                         <Link
@@ -67,17 +67,17 @@ const ScrollableRow = ({ title, products }) => {
     );
 };
 
-const ProductList = ({ initialCategoryId = null, userId }) => {
+const ProductList = ({initialCategoryId = null, userId}) => {
     const [categoryId, setCategoryId] = useState(initialCategoryId);
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const { products: allProducts, loading: allLoading, error: allError } = useProducts();
-    const { products: categoryProducts, loading: categoryLoading, error: categoryError, noProducts } =
+    const {products: allProducts, loading: allLoading, error: allError} = useProducts();
+    const {products: categoryProducts, loading: categoryLoading, error: categoryError, noProducts} =
         useProductsByCategory(categoryId);
 
-    const { mostPurchased } = useMostPurchasedProducts(userId);
+    const {mostPurchased} = useMostPurchasedProducts(userId);
 
     useEffect(() => {
         if (categoryId) {
@@ -113,17 +113,18 @@ const ProductList = ({ initialCategoryId = null, userId }) => {
     return (
         <div className="flex">
             {/* Sidebar is always visible */}
-            <LeftFilterNav setCategoryId={setCategoryId} />
+            <LeftFilterNav setCategoryId={setCategoryId}/>
 
             <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
                 <h2 className="sr-only">Products</h2>
 
                 {/* Scrollable Rows */}
                 {mostPurchased.userProducts.length > 0 && (
-                    <ScrollableRow title="Dine mest købte produkter" products={mostPurchased.userProducts} />
+                    <ScrollableRow title="Dine mest købte produkter" products={mostPurchased.userProducts}/>
                 )}
                 {mostPurchased.overallProducts.length > 0 && (
-                    <ScrollableRow title="De mest populære produkter blandt andre" products={mostPurchased.overallProducts} />
+                    <ScrollableRow title="De mest populære produkter blandt andre"
+                                   products={mostPurchased.overallProducts}/>
                 )}
 
                 {/* If no products are found for the category, display message */}
@@ -134,7 +135,8 @@ const ProductList = ({ initialCategoryId = null, userId }) => {
                 )}
 
                 {/* Product Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 xl:gap-x-8">
+                <div
+                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 xl:gap-x-8">
                     {products.length === 0 ? (
                         <div className="col-span-full text-center text-lg text-gray-500">
                             No products to display.
@@ -148,21 +150,8 @@ const ProductList = ({ initialCategoryId = null, userId }) => {
                                     className="aspect-square w-full rounded-lg bg-gray-200 object-cover group-hover:opacity-75 xl:aspect-[7/8]"
                                 />
                                 <h3 className="mt-4 text-sm text-gray-700">{product.productName}</h3>
-                                <p className="mt-1 text-sm text-gray-700">{product.description}</p>
                                 <p className="mt-1 text-lg font-medium text-gray-900">${product.price}</p>
-                                <p className="mt-1 text-sm text-gray-700">Stock: {product.stockLevel}</p>
-                                <p className="text-sm text-gray-700">
-                                    Allergier:{" "}
-                                    {product.allergies ? (
-                                        product.allergyType !== null && product.allergyType !== undefined ? (
-                                            allergyTypeNames[product.allergyType] || "Ukendt Allergi"
-                                        ) : (
-                                            "Ukendt Allergi"
-                                        )
-                                    ) : (
-                                        "Nej"
-                                    )}
-                                </p>
+
                             </Link>
                         ))
                     )}
