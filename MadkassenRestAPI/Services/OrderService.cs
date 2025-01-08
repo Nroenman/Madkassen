@@ -95,7 +95,7 @@ public async Task<List<ProductSummary>> GetTopProductsOverallAsync(int days)
             TotalQuantity = group.Sum(g => g.Quantity)
         })
         .OrderByDescending(ps => ps.TotalQuantity)
-        .Take(5) // Limit to top 5 products
+        .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
         .ToListAsync();
 }
 
