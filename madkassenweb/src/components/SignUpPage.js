@@ -33,7 +33,7 @@ const SignUpPage = () => {
 
         const response = await register(email, password, userName);
         if (response) {
-            setSuccessMessage("Account created successfully! Redirecting to login...");
+            setSuccessMessage("Din konto er blevet oprettet! Du bliver nu omdirigeret til login siden...");
             setTimeout(() => (window.location.href = "/login"), 2000);
         }
     };
@@ -43,7 +43,7 @@ const SignUpPage = () => {
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
                 <img className="mx-auto h-10 w-auto" src={logomad} alt="Madkassen"/>
                 <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
-                    Create Account
+                    Opret konto
                 </h2>
             </div>
 
@@ -52,7 +52,7 @@ const SignUpPage = () => {
                     {/* Username Field */}
                     <div>
                         <label htmlFor="userName" className="block text-sm font-medium text-gray-900">
-                            Username
+                            Brugernavn
                             <FontAwesomeIcon icon={faCheck}
                                              className={validUserName ? "text-green-500 ml-2" : "hidden"}/>
                             <FontAwesomeIcon icon={faTimes}
@@ -69,16 +69,15 @@ const SignUpPage = () => {
                                 }}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                placeholder="Angiv Brugernavn"
                             />
                         </div>
                         {userName && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={/[A-Z]/.test(userName) ? "text-green-600" : "text-red-600"}>Contains
-                                        at least 1 uppercase letter.
+                                    <li className={/[A-Z]/.test(userName) ? "text-green-600" : "text-red-600"}>Skal indeholde et stort bogstav.
                                     </li>
-                                    <li className={userName.length >= 5 ? "text-green-600" : "text-red-600"}>At least 5
-                                        characters long.
+                                    <li className={userName.length >= 5 ? "text-green-600" : "text-red-600"}>Skal være mindst 5 karakterer langt.
                                     </li>
                                 </ul>
                             </div>
@@ -106,14 +105,14 @@ const SignUpPage = () => {
                                 }}
                                 required
                                 className="block w-full rounded-md bg-white pl-10 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter your email"
+                                placeholder="Angiv Email adresse"
                             />
                         </div>
                         {email && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={validEmail ? "text-green-600" : "text-red-600"}>Must include an "@"
-                                        and a ".".
+                                    <li className={validEmail ? "text-green-600" : "text-red-600"}>Skal indeholde "@"
+                                        og et "." eks. din@mail.dk.
                                     </li>
                                 </ul>
                             </div>
@@ -136,7 +135,7 @@ const SignUpPage = () => {
                                 }}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Enter your password"
+                                placeholder="Angiv Password"
                             />
                             <button
                                 type="button"
@@ -149,17 +148,13 @@ const SignUpPage = () => {
                         {password && (
                             <div className="mt-1 text-sm text-gray-600">
                                 <ul>
-                                    <li className={password.length >= 8 ? "text-green-600" : "text-red-600"}>At least 8
-                                        characters long.
+                                    <li className={password.length >= 8 ? "text-green-600" : "text-red-600"}>Skal minimum have 8 karakterer.
                                     </li>
-                                    <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
-                                        at least 1 uppercase letter.
+                                    <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-600"}>Skal inedholde minimum ét stort bogstav.
                                     </li>
-                                    <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
-                                        at least 1 number.
+                                    <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-600"}>Skal indeholde minimum ét tal.
                                     </li>
-                                    <li className={/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "text-green-600" : "text-red-600"}>Contains
-                                        at least 1 special character.
+                                    <li className={/[!@#$%^&*(),.?":{}|<>]/.test(password) ? "text-green-600" : "text-red-600"}>Skal indeholde minimum ét specialtegn.
                                     </li>
                                 </ul>
                             </div>
@@ -169,7 +164,7 @@ const SignUpPage = () => {
                     {/* Confirm Password Field */}
                     <div>
                         <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900">
-                            Confirm Password
+                            Bekræft Password
                         </label>
                         <div className="mt-2 relative">
                             <input
@@ -179,7 +174,7 @@ const SignUpPage = () => {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
-                                placeholder="Confirm your password"
+                                placeholder="Bekræft Password"
                             />
                             <button
                                 type="button"
@@ -198,7 +193,7 @@ const SignUpPage = () => {
                             disabled={!validUserName || !validEmail || !validPassword}
                             className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
                         >
-                            Sign Up
+                            Opret
                         </button>
                     </div>
                 </form>
