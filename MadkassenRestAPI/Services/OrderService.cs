@@ -2,16 +2,21 @@
 using MadkassenRestAPI.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace MadkassenRestAPI.Services;
-
-public class OrderService(ApplicationDbContext context)
+public class OrderService
 {
+    private readonly ApplicationDbContext _context;
+
+    public OrderService(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
     public async Task<int> CreateOrderAsync(int userId)
     {
         // Step 1: Get cart items for the user, including the ProductName
-        var cartItems = await context.CartItems
+        var cartItems = await _context.CartItems
             .Where(ci => ci.UserId == userId)
-            .Include(ci => ci.Produkter) // Ensure Product information (including ProductName) is loaded
+            .Include(ci => ci.Produkter)  // Ensure Product information (including ProductName) is loaded
             .ToListAsync();
 
         if (cartItems.Count == 0)
@@ -31,8 +36,8 @@ public class OrderService(ApplicationDbContext context)
             TotalAmount = totalAmount
         };
 
-        context.Orders.Add(newOrder);
-        await context.SaveChangesAsync();
+        _context.Orders.Add(newOrder);
+        await _context.SaveChangesAsync();
 
         // Step 4: Retrieve the newly created OrderId
         var orderId = newOrder.OrderId;
@@ -44,55 +49,54 @@ public class OrderService(ApplicationDbContext context)
             ProductId = ci.ProductId,
             Quantity = ci.Quantity,
             Price = ci.Produkter.Price,
-            ProductName = ci.Produkter.ProductName
+            ProductName = ci.Produkter.ProductName  // Ensure ProductName is set correctly
         }).ToList();
 
-        context.OrderItems.AddRange(orderItems);
-        await context.SaveChangesAsync();
+        _context.OrderItems.AddRange(orderItems);
+        await _context.SaveChangesAsync();
 
         // Step 6: Remove items from the cart after the order is placed
-        context.CartItems.RemoveRange(cartItems);
-        await context.SaveChangesAsync();
+        _context.CartItems.RemoveRange(cartItems);
+        await _context.SaveChangesAsync();
 
         // Return the newly created OrderId
         return orderId;
     }
 
     public async Task<List<ProductSummary>> GetTopProductsByUserAsync(int userId, int days)
-    {
-        var fromDate = DateTime.UtcNow.AddDays(-days);
+{
+    var fromDate = DateTime.UtcNow.AddDays(-days);
 
-        return await context.OrderItems
-            .Where(oi => oi.Order.OrderDate >= fromDate && oi.Order.UserId == userId)
-            .GroupBy(oi => new { oi.ProductId, oi.ProductName, oi.Produkter.ImageUrl})
-            .Select(group => new ProductSummary
-            {
-                ProductId = group.Key.ProductId,
-                ProductName = group.Key.ProductName,
-                ImageUrl = group.Key.ImageUrl,
-                TotalQuantity = group.Sum(g => g.Quantity)
-            })
-            .OrderByDescending(ps => ps.TotalQuantity)
-            .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
-            .ToListAsync();
-    }
+    return await _context.OrderItems
+        .Where(oi => oi.Order.OrderDate >= fromDate && oi.Order.UserId == userId)
+        .GroupBy(oi => new { oi.ProductId, oi.ProductName })
+        .Select(group => new ProductSummary
+        {
+            ProductId = group.Key.ProductId,
+            ProductName = group.Key.ProductName,
+            TotalQuantity = group.Sum(g => g.Quantity)
+        })
+        .OrderByDescending(ps => ps.TotalQuantity)
+        .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
+        .ToListAsync();
+}
 
-    public async Task<List<ProductSummary>> GetTopProductsOverallAsync(int days)
-    {
-        var fromDate = DateTime.UtcNow.AddDays(-days);
+public async Task<List<ProductSummary>> GetTopProductsOverallAsync(int days)
+{
+    var fromDate = DateTime.UtcNow.AddDays(-days);
 
-        return await context.OrderItems
-            .Where(oi => oi.Order.OrderDate >= fromDate)
-            .GroupBy(oi => new { oi.ProductId, oi.ProductName, oi.Produkter.ImageUrl })
-            .Select(group => new ProductSummary
-            {
-                ProductId = group.Key.ProductId,
-                ProductName = group.Key.ProductName,
-                ImageUrl = group.Key.ImageUrl,
-                TotalQuantity = group.Sum(g => g.Quantity)
-            })
-            .OrderByDescending(ps => ps.TotalQuantity)
-            .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
-            .ToListAsync();
-    }
+    return await _context.OrderItems
+        .Where(oi => oi.Order.OrderDate >= fromDate)
+        .GroupBy(oi => new { oi.ProductId, oi.ProductName })
+        .Select(group => new ProductSummary
+        {
+            ProductId = group.Key.ProductId,
+            ProductName = group.Key.ProductName,
+            TotalQuantity = group.Sum(g => g.Quantity)
+        })
+        .OrderByDescending(ps => ps.TotalQuantity)
+        .Take(10) // 10 mest købte produkter.. kan ændres til det antal vi synes bedst om.
+        .ToListAsync();
+}
+
 }
