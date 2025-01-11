@@ -12,7 +12,6 @@ namespace ClassLibrary.Model
         // Navigation property for the related Order
         public Order Order { get; set; }  // Add the navigation property to Order
 
-        // Navigation property for the related Product (Produkter)
-        public Produkter Produkter { get; set; }  // Add the navigation property to Produkter
+        public Produkter Produkter { get; set; } 
     }
 }

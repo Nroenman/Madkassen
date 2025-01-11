@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using ClassLibrary.Model;
+using MadkassenRestAPI.Services;
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -12,8 +13,12 @@ namespace MadkassenRestAPI.Controllers
         ILogger<OrderController> logger)
         : ControllerBase
     {
-        private readonly OrderService _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
-        private readonly IConfiguration _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        private readonly OrderService _orderService =
+            orderService ?? throw new ArgumentNullException(nameof(orderService));
+
+        private readonly IConfiguration _configuration =
+            configuration ?? throw new ArgumentNullException(nameof(configuration));
+
         private readonly ILogger<OrderController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         [HttpPost("checkout")]
@@ -50,51 +55,50 @@ namespace MadkassenRestAPI.Controllers
         }
 
         [HttpGet("TopProductsByUser")]
-public async Task<IActionResult> GetTopProductsByUser()
-{
-    try
-    {
-        var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-        if (string.IsNullOrEmpty(token))
+        public async Task<IActionResult> GetTopProductsByUser()
         {
-            _logger.LogWarning("No token provided.");
-            return Unauthorized(new { Message = "No token provided." });
+            try
+            {
+                var token = Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("No token provided.");
+                    return Unauthorized(new { Message = "No token provided." });
+                }
+
+                var userProfile = await GetUserProfileFromToken(token);
+                if (userProfile == null)
+                {
+                    _logger.LogWarning("Invalid or expired token.");
+                    return Unauthorized(new { Message = "Invalid or expired token." });
+                }
+
+                var userId = int.Parse(userProfile.UserId);
+                var products = await _orderService.GetTopProductsByUserAsync(userId, 30);
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching top products by user: {ex.Message}", ex);
+                return BadRequest(new { Message = "Error: " + ex.Message });
+            }
         }
 
-        var userProfile = await GetUserProfileFromToken(token);
-        if (userProfile == null)
+        [HttpGet("TopProductsOverall")]
+        public async Task<IActionResult> GetTopProductsOverall()
         {
-            _logger.LogWarning("Invalid or expired token.");
-            return Unauthorized(new { Message = "Invalid or expired token." });
+            try
+            {
+                var products = await _orderService.GetTopProductsOverallAsync(30);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error fetching top products overall: {ex.Message}", ex);
+                return BadRequest(new { Message = "Error: " + ex.Message });
+            }
         }
-
-        var userId = int.Parse(userProfile.UserId);
-        var products = await _orderService.GetTopProductsByUserAsync(userId, 30);
-
-        return Ok(products);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error fetching top products by user: {ex.Message}", ex);
-        return BadRequest(new { Message = "Error: " + ex.Message });
-    }
-}
-
-[HttpGet("TopProductsOverall")]
-public async Task<IActionResult> GetTopProductsOverall()
-{
-    try
-    {
-        var products = await _orderService.GetTopProductsOverallAsync(30);
-        return Ok(products);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError($"Error fetching top products overall: {ex.Message}", ex);
-        return BadRequest(new { Message = "Error: " + ex.Message });
-    }
-}
-
 
 
         private async Task<UserProfile> GetUserProfileFromToken(string token)
