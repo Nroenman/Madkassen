@@ -1,54 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ClassLibrary.Model;
-using MadkassenRestAPI.Data;
-using MadkassenRestAPI.Models;
 using MadkassenRestAPI.Services;
 
 namespace MadkassenRestAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController(ApplicationDbContext context, UserService userService) : ControllerBase
+    public class ProductController : ControllerBase
     {
-        
-        
-        // Get all products
+        private readonly ProductService _productService;
+
+        public ProductController(ProductService productService)
+        {
+            _productService = productService;
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
         {
-            var products = await context.Produkter
-                .Select(product => new Produkter
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    Description = product.Description,
-                    CategoryId = product.CategoryId,
-                    Allergies = product.Allergies,
-                    AllergyType = product.AllergyType,
-                    Price = product.Price,
-                    StockLevel = product.StockLevel,
-                    ImageUrl = product.ComputedImageUrl
-                })
-                .ToListAsync();
-
+            var products = await _productService.GetAllProductsAsync();
             return Ok(products);
         }
 
-        // Get a product by id
         [HttpGet("{id}")]
         public async Task<ActionResult<Produkter>> GetProduct(int id)
         {
-            var product = await context.Produkter.FindAsync(id);
+            var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            // Apply placeholder only if ImageUrl is null or empty
             if (string.IsNullOrEmpty(product.ImageUrl))
             {
-                product.ImageUrl = "https://i.imghippo.com/files/KCsO2582jBE.png"; // Apply placeholder if null or empty
+                product.ImageUrl = "https://i.imghippo.com/files/KCsO2582jBE.png";
             }
 
             return Ok(product);
@@ -57,83 +42,36 @@ namespace MadkassenRestAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Produkter>> AddProduct(Produkter product)
         {
-            var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
-            if (authHeader == null || !authHeader.StartsWith("Bearer "))
-            {
-                return Unauthorized(new { message = "Authorization token is missing" });
-            }
-
-            var token = authHeader.Substring("Bearer ".Length).Trim();
-
-            User user = null;
-            try
-            {
-                user = userService.GetUserFromJwtToken(token); // Use GetUserFromJwtToken method
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized(new { message = "Invalid token or user not found" });
-            }
-
-            if (user.Roles != "Administrator")
-            {
-                return StatusCode(403, new { message = "You do not have permission to perform this action" });
-            }
-
-            // Add the product if the user is authorized
-            context.Produkter.Add(product);
-            await context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetProduct), new { id = product.ProductId }, product);
+            var newProduct = await _productService.AddProductAsync(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = newProduct.ProductId }, newProduct);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductStock(int id, [FromBody] UpdateStockRequest request)
         {
-            var product = await context.Produkter.FindAsync(id);
-            if (product == null)
+            var updatedProduct = await _productService.UpdateProductStockAsync(id, request.Quantity);
+            if (updatedProduct == null)
             {
-                return NotFound("Product not found");
+                return BadRequest("Not enough stock available or product not found");
             }
 
-            // Ensure that the stock is enough to reserve the quantity
-            if (product.StockLevel < request.Quantity)
-            {
-                return BadRequest("Not enough stock available");
-            }
-
-            // Deduct stock for reservation
-            product.StockLevel -= request.Quantity;
-
-            // Save the updated product
-            await context.SaveChangesAsync();
-
-            return Ok(product);
+            return Ok(updatedProduct);
         }
-        // Endpoint to get products by category ID
+
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetProductsByCategory(int categoryId)
         {
-            // Check if the categoryId is valid (e.g., greater than 0)
             if (categoryId <= 0)
             {
                 return BadRequest(new { message = "Invalid category ID" });
             }
 
-            var productsQuery = context.Produkter
-                .Where(p => p.CategoryId == categoryId); // Filter by category
-
-            productsQuery = productsQuery.OrderBy(p => p.Price);
-
-            var products = await productsQuery
-                .ToListAsync();
-
+            var products = await _productService.GetProductsByCategoryAsync(categoryId);
             if (products == null || products.Count == 0)
             {
                 return NotFound(new { message = "No products found in this category" });
             }
 
-            // Return the products list with pagination details if necessary
             return Ok(products);
         }
     }
