@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MadkassenRestAPI.Services;
-using MadkassenRestAPI.Data;
 using ClassLibrary.Model;
 using Xunit;
 using ClassLibrary;
+using MadkassenRestAPI.Models;
 using Xunit.Abstractions;
 using Assert = Xunit.Assert;
 

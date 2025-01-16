@@ -1,67 +1,65 @@
-using Microsoft.EntityFrameworkCore;
 using ClassLibrary.Model;
-using MadkassenRestAPI.Data;
+using MadkassenRestAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace MadkassenRestAPI.Services
+namespace MadkassenRestAPI.Services;
+
+public class ProductService(ApplicationDbContext context)
 {
-    public class ProductService
+    public async Task<List<Produkter>> GetAllProductsAsync()
     {
-        private readonly ApplicationDbContext _context;
+        return await context.Produkter.ToListAsync();  // Fetches all products directly
+    }
 
-        public ProductService(ApplicationDbContext context)
+    public async Task<Produkter> GetProductByIdAsync(int id)
+    {
+        var product = await context.Produkter.FindAsync(id);
+        if (product == null)
         {
-            _context = context;
+            return null;
+        }
+        return product;
+    }
+
+    public async Task<Produkter> AddProductAsync(Produkter product)
+    {
+        if (product == null)
+        {
+            throw new ArgumentNullException(nameof(product), "Product cannot be null.");
         }
 
-        public async Task<List<Produkter>> GetAllProductsAsync()
+        var existingProduct = await context.Produkter
+            .FirstOrDefaultAsync(p => p.ProductName == product.ProductName);
+        if (existingProduct != null)
         {
-            return await _context.Produkter
-                .Select(product => new Produkter
-                {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    Description = product.Description,
-                    CategoryId = product.CategoryId,
-                    Allergies = product.Allergies,
-                    AllergyType = product.AllergyType,
-                    Price = product.Price,
-                    StockLevel = product.StockLevel,
-                    ImageUrl = product.ComputedImageUrl
-                })
-                .ToListAsync();
+            throw new InvalidOperationException($"Product with name {product.ProductName} already exists.");
         }
 
-        public async Task<Produkter> GetProductByIdAsync(int id)
+        context.Produkter.Add(product);
+        await context.SaveChangesAsync();
+        return product;
+    }
+
+    public async Task<Produkter> UpdateProductStockAsync(int id, int quantity)
+    {
+        var product = await context.Produkter.FindAsync(id);
+        if (product == null || product.StockLevel < quantity)
         {
-            return await _context.Produkter.FindAsync(id);
+            return null;
         }
 
-        public async Task<Produkter> AddProductAsync(Produkter product)
-        {
-            _context.Produkter.Add(product);
-            await _context.SaveChangesAsync();
-            return product;
-        }
+        product.StockLevel -= quantity;
+        await context.SaveChangesAsync();
+        return product;
+    }
 
-        public async Task<Produkter> UpdateProductStockAsync(int id, int quantity)
-        {
-            var product = await _context.Produkter.FindAsync(id);
-            if (product == null || product.StockLevel < quantity)
-            {
-                return null;
-            }
+    public async Task<List<Produkter>> GetProductsByCategoryAsync(int categoryId)
+    {
+        var products = await context.Produkter
+            .Where(p => p.CategoryId == categoryId)
+            .OrderBy(p => p.Price)
+            .ToListAsync();
 
-            product.StockLevel -= quantity;
-            await _context.SaveChangesAsync();
-            return product;
-        }
-
-        public async Task<List<Produkter>> GetProductsByCategoryAsync(int categoryId)
-        {
-            return await _context.Produkter
-                .Where(p => p.CategoryId == categoryId)
-                .OrderBy(p => p.Price)
-                .ToListAsync();
-        }
+        return products ?? new List<Produkter>();  
     }
 }

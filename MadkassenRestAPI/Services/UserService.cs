@@ -1,5 +1,5 @@
 ﻿using MadkassenRestAPI.Models; // Import the correct User model
-using MadkassenRestAPI.Data;    // Import the ApplicationDbContext
+// Import the ApplicationDbContext
 using System.IdentityModel.Tokens.Jwt;
 
 namespace MadkassenRestAPI.Services

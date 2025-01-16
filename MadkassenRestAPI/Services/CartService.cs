@@ -1,4 +1,3 @@
-using MadkassenRestAPI.Data;
 using MadkassenRestAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System;

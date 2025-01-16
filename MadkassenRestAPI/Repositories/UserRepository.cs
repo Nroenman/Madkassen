@@ -1,5 +1,5 @@
 ﻿using MadkassenRestAPI.Models;
-using MadkassenRestAPI.Data; // Import your DbContext namespace
+// Import your DbContext namespace
 using System.Linq;
 
 namespace MadkassenRestAPI.Repositories

@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace MadkassenRestAPI.Middleware
@@ -8,13 +9,12 @@ namespace MadkassenRestAPI.Middleware
         public async Task Invoke(HttpContext context)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
             if (!string.IsNullOrEmpty(token))
             {
                 try
                 {
                     var tokenHandler = new JwtSecurityTokenHandler();
-                    var key = System.Text.Encoding.ASCII.GetBytes(configuration["AppSettings:Token"]);
+                    var key = Encoding.ASCII.GetBytes(configuration["AppSettings:Token"]);
 
                     var validationParameters = new TokenValidationParameters
                     {
@@ -24,15 +24,21 @@ namespace MadkassenRestAPI.Middleware
                         ValidateAudience = true,
                         ValidIssuer = configuration["AppSettings:Issuer"],
                         ValidAudience = configuration["AppSettings:Audience"],
-                        ClockSkew = TimeSpan.Zero // No tolerance for clock skew
+                        ClockSkew = TimeSpan.Zero
                     };
 
                     var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
                     var userId = principal.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                    var roles = principal.Claims.FirstOrDefault(c => c.Type == "roles")?.Value;
 
                     if (userId != null)
                     {
-                        context.Items["User"] = userId;
+                        context.Items["User"] = userId;  // Store the userId for later use
+                    }
+
+                    if (roles != null)
+                    {
+                        context.Items["Roles"] = roles.Split(',');  // Store roles in context as well
                     }
                 }
                 catch (Exception ex)
@@ -40,13 +46,6 @@ namespace MadkassenRestAPI.Middleware
                     logger.LogError($"JWT Token validation failed: {ex.Message}");
                 }
             }
-            else
-            {
-                // Log if no token was provided
-                logger.LogWarning("No token provided in request.");
-            }
-
-            // Proceed with the next middleware
             await next(context);
         }
     }
