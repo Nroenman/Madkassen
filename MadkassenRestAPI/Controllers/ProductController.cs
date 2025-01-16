@@ -50,13 +50,15 @@ namespace MadkassenRestAPI.Controllers
         public async Task<IActionResult> UpdateProductStock(int id, [FromBody] UpdateStockRequest request)
         {
             var updatedProduct = await _productService.UpdateProductStockAsync(id, request.Quantity);
+
             if (updatedProduct == null)
             {
-                return BadRequest("Not enough stock available or product not found");
+                return BadRequest("Not enough stock available");
             }
 
             return Ok(updatedProduct);
         }
+
 
         [HttpGet("category/{categoryId}")]
         public async Task<IActionResult> GetProductsByCategory(int categoryId)

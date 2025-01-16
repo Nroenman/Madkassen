@@ -38,6 +38,7 @@ namespace MadkassenRestAPI.Services
 
         public async Task<Produkter> AddProductAsync(Produkter product)
         {
+
             _context.Produkter.Add(product);
             await _context.SaveChangesAsync();
             return product;
@@ -46,12 +47,20 @@ namespace MadkassenRestAPI.Services
         public async Task<Produkter> UpdateProductStockAsync(int id, int quantity)
         {
             var product = await _context.Produkter.FindAsync(id);
-            if (product == null || product.StockLevel < quantity)
+            if (product == null)
             {
-                return null;
+                return null; // Return null if the product doesn't exist
             }
 
-            product.StockLevel -= quantity;
+            // If the quantity is negative, check if enough stock is available
+            if (quantity < 0 && product.StockLevel < Math.Abs(quantity))
+            {
+                return null; // Not enough stock available to decrease
+            }
+
+            // Update stock level
+            product.StockLevel += quantity;
+
             await _context.SaveChangesAsync();
             return product;
         }
