@@ -47,5 +47,17 @@ namespace MadkassenRestAPI.Controllers
 
             return Ok(product);
         }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProductStock(int id, [FromBody] UpdateStockRequest request)
+        {
+            var updatedProduct = await productService.UpdateProductStockAsync(id, request.Quantity);
+
+            if (updatedProduct == null)
+            {
+                return BadRequest("Not enough stock available");
+            }
+
+            return Ok(updatedProduct);
+        }
     }
 }

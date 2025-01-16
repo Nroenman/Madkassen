@@ -43,12 +43,18 @@ public class ProductService(ApplicationDbContext context)
     public async Task<Produkter> UpdateProductStockAsync(int id, int quantity)
     {
         var product = await context.Produkter.FindAsync(id);
-        if (product == null || product.StockLevel < quantity)
+        if (product == null)
         {
             return null;
         }
 
-        product.StockLevel -= quantity;
+        if (quantity < 0 && product.StockLevel < Math.Abs(quantity))
+        {
+            return null;
+        }
+
+        product.StockLevel += quantity;
+
         await context.SaveChangesAsync();
         return product;
     }
@@ -62,4 +68,5 @@ public class ProductService(ApplicationDbContext context)
 
         return products ?? new List<Produkter>();  
     }
+  
 }
