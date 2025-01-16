@@ -2,13 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ClassLibrary.Model;
 using MadkassenRestAPI.Data;
+using MadkassenRestAPI.Models;
+using MadkassenRestAPI.Services;
 
 namespace MadkassenRestAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController(ApplicationDbContext context) : ControllerBase
+    public class ProductController(ApplicationDbContext context, UserService userService) : ControllerBase
     {
+        
+        
         // Get all products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
@@ -50,10 +54,33 @@ namespace MadkassenRestAPI.Controllers
             return Ok(product);
         }
 
-        // Add a new product
         [HttpPost]
         public async Task<ActionResult<Produkter>> AddProduct(Produkter product)
         {
+            var authHeader = HttpContext.Request.Headers["Authorization"].FirstOrDefault();
+            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized(new { message = "Authorization token is missing" });
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+
+            User user = null;
+            try
+            {
+                user = userService.GetUserFromJwtToken(token); // Use GetUserFromJwtToken method
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new { message = "Invalid token or user not found" });
+            }
+
+            if (user.Roles != "Administrator")
+            {
+                return StatusCode(403, new { message = "You do not have permission to perform this action" });
+            }
+
+            // Add the product if the user is authorized
             context.Produkter.Add(product);
             await context.SaveChangesAsync();
 
