@@ -4,6 +4,7 @@ using MadkassenRestAPI.Services;
 using System.Security.Claims;
 using MadkassenRestAPI.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace MadkassenRestAPI.Controllers
 {
@@ -12,6 +13,22 @@ namespace MadkassenRestAPI.Controllers
     public class ProductController(ProductService productService, ApplicationDbContext context)
         : ControllerBase
     {
+        public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
+        {
+            var products = await context.Produkter.ToListAsync();
+
+            foreach (var product in products)
+            {
+                if (string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    product.ImageUrl =
+                        "https://i.imghippo.com/files/KCsO2582jBE.png"; // Apply placeholder if null or empty
+                }
+            }
+
+            return Ok(products);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Produkter>> AddProduct(Produkter product)
         {
@@ -47,6 +64,7 @@ namespace MadkassenRestAPI.Controllers
 
             return Ok(product);
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProductStock(int id, [FromBody] UpdateStockRequest request)
         {
