@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="772d0376-aaff-4e11-b4b1-6a316259c286" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Api/AddProductService.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Hooks/useAddProduct.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/AddProductPage.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/left-filter-nav.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/left-filter-nav.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Navbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Navbar.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,7 +60,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1737108606409</updated>
-      <workItem from="1737108607921" duration="4864000" />
+      <workItem from="1737108607921" duration="6939000" />
     </task>
     <servers />
   </component>
