@@ -13,6 +13,7 @@ namespace MadkassenRestAPI.Controllers
     public class ProductController(ProductService productService, ApplicationDbContext context)
         : ControllerBase
     {
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Produkter>>> GetAllProducts()
         {
             var products = await context.Produkter.ToListAsync();
