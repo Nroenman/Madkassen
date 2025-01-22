@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemText, Collapse, Checkbox, FormControlLabel } from "@mui/material";
+import React, {useState, useEffect} from "react";
+import {Link, useLocation} from "react-router-dom";
+import {Drawer, List, ListItem, ListItemText, Collapse, Checkbox, FormControlLabel} from "@mui/material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import useCategories from "../Hooks/useCategories"; // Import the custom hook
+import useCategories from "../Hooks/useCategories";
 
-const LeftFilterNav = ({ setCategoryId, setSelectedAllergies }) => {
+const LeftFilterNav = ({setCategoryId, setSelectedAllergies}) => {
     const location = useLocation();
     const shouldShowSidebar = location.pathname === "/productlist";
 
-    const { categories, loading, error } = useCategories();
+    const {categories, loading, error} = useCategories();
     const [allergyDropdownOpen, setAllergyDropdownOpen] = useState(false);
     const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
@@ -27,7 +27,6 @@ const LeftFilterNav = ({ setCategoryId, setSelectedAllergies }) => {
     };
 
     const toggleAllergy = (allergyId) => {
-        // Toggle allergy selection
         const updatedAllergies = selectedAllergies.includes(allergyId)
             ? selectedAllergies.filter((id) => id !== allergyId)
             : [...selectedAllergies, allergyId];
@@ -63,20 +62,25 @@ const LeftFilterNav = ({ setCategoryId, setSelectedAllergies }) => {
                 [`& .MuiDrawer-paper`]: {
                     width: 250,
                     boxSizing: "border-box",
-                    marginTop: "64px", // Align with Navbar height
+                    marginTop: "64px",
                 },
             }}
         >
             <List>
+                <ListItem>
+                    <Link to="/add-product" style={{textDecoration: "none", color: "inherit"}}>
+                        Add Product
+                    </Link>
+                </ListItem>
                 {/* Allergy Filter Dropdown */}
                 <ListItem button onClick={() => setAllergyDropdownOpen(!allergyDropdownOpen)}>
-                    <ListItemText primary="Filtrer Allergener" />
-                    {allergyDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    <ListItemText primary="Filtrer Allergener"/>
+                    {allergyDropdownOpen ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
                 </ListItem>
                 <Collapse in={allergyDropdownOpen} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
                         {Object.entries(allergyTypeNames).map(([id, name]) => (
-                            <ListItem key={id} sx={{ pl: 4 }}>
+                            <ListItem key={id} sx={{pl: 4}}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -93,13 +97,13 @@ const LeftFilterNav = ({ setCategoryId, setSelectedAllergies }) => {
 
                 {/* All Products Tab */}
                 <ListItem button onClick={() => setCategoryId(null)}>
-                    <ListItemText primary="Alle produkter" />
+                    <ListItemText primary="Alle produkter"/>
                 </ListItem>
 
                 {/* Categories Dropdown */}
                 <ListItem button onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}>
-                    <ListItemText primary="Kategorier" />
-                    {categoryDropdownOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    <ListItemText primary="Kategorier"/>
+                    {categoryDropdownOpen ? <ExpandLessIcon/> : <ExpandMoreIcon/>}
                 </ListItem>
                 <Collapse in={categoryDropdownOpen} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
@@ -108,9 +112,9 @@ const LeftFilterNav = ({ setCategoryId, setSelectedAllergies }) => {
                                 button
                                 key={category.categoryId}
                                 onClick={() => setCategoryId(category.categoryId)}
-                                sx={{ pl: 4 }}
+                                sx={{pl: 4}}
                             >
-                                <ListItemText primary={category.categoryName} />
+                                <ListItemText primary={category.categoryName}/>
                             </ListItem>
                         ))}
                     </List>

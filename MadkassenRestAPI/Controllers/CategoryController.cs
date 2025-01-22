@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MadkassenRestAPI.Data;  // Ensure this is the correct namespace for ApplicationDbContext
-using ClassLibrary;  // If this is where the Kategori class is defined
+// Ensure this is the correct namespace for ApplicationDbContext
+using ClassLibrary;
+using MadkassenRestAPI.Models; // If this is where the Kategori class is defined
 
 namespace MadkassenRestAPI.Controllers
 {

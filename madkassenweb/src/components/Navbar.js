@@ -1,47 +1,76 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { AppBar, Toolbar, Button, Typography } from "@mui/material";
-import thumbnailmad from "../images/thumbnailmad.png";
+import { AppBar, Toolbar, Button, Typography, Menu, MenuItem } from "@mui/material";
+import thumbnailmad from "../images/thumbnailmad.png"; // Madkassen logo
 import useAuth from "../Hooks/useAuth";
 import { useCart } from "../context/CartContext";
 import { Toaster } from "react-hot-toast";
+import userImage from "../assets/user.png"; // Import the user image
 
 const Navbar = () => {
     const { isAuthenticated, logout, getUserInfo } = useAuth();
     const { cartItems } = useCart();
+    const [anchorEl, setAnchorEl] = useState(null); // State to control dropdown
 
     const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-
     const userInfo = getUserInfo();
     const userName = userInfo?.userName;
     const userEmail = userInfo?.email;
 
+    // Handle opening and closing the dropdown menu
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <AppBar position="fixed" className="bg-indigo-600 shadow-md">
             <Toolbar className="flex justify-between items-center px-6 py-3">
+                {/* Left Section: Logo */}
                 <img
                     src={thumbnailmad}
                     alt="Madkassen Thumbnail"
                     className="h-10 cursor-pointer"
-                    onClick={() => window.location.href = "/"}
+                    onClick={() => (window.location.href = "/")}
                 />
 
-                <div className="flex space-x-6">
-                    <Button color="inherit" component={Link} to="/productlist" className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
+                {/* Middle Section: Navigation Tabs */}
+                <div className="flex-1 flex justify-center space-x-6">
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/productlist"
+                        className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                    >
                         Produkter
                     </Button>
-                    <Button color="inherit" component={Link} to="/about" className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
+                    <Button
+                        color="inherit"
+                        component={Link}
+                        to="/about"
+                        className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                    >
                         Om os
                     </Button>
                     {isAuthenticated() && (
-                        <Button color="inherit" component={Link} to="/profile" className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/profile"
+                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                        >
                             Min Profil
                         </Button>
                     )}
                 </div>
 
-                <div className="relative">
-                    <Link to="/cart" className="flex items-center">
+                {/* Right Section: Cart and Profile */}
+                <div className="flex items-center space-x-4 ml-auto">
+                    {/* Cart */}
+                    <Link to="/cart" className="relative">
                         <span className="text-white text-2xl">🛒</span>
                         {totalItems > 0 && (
                             <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full -mt-1 -mr-1">
@@ -49,29 +78,51 @@ const Navbar = () => {
                             </span>
                         )}
                     </Link>
-                </div>
 
-                <div className="flex items-center space-x-4">
-                    {/* Show the user's email if authenticated */}
-                    {isAuthenticated() && userEmail && (
-                        <Typography variant="body2" className="text-white">
-                            {userEmail}
-                        </Typography>
-                    )}
-
-                    {/* Show Login or Logout button */}
-                    {!isAuthenticated() ? (
-                        <Button color="inherit" component={Link} to="/login" className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
-                            Login
-                        </Button>
+                    {/* Profile */}
+                    {isAuthenticated() ? (
+                        <div className="flex items-center space-x-4">
+                            <img
+                                src={userImage}
+                                alt="User"
+                                className="h-8 w-8 rounded-full cursor-pointer"
+                                onClick={handleMenuOpen}
+                            />
+                            <Button
+                                color="inherit"
+                                onClick={handleMenuOpen}
+                                className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                            >
+                                {userName || "User"}
+                            </Button>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
+                                    Profile
+                                </MenuItem>
+                                <MenuItem onClick={handleMenuClose} component={Link} to="/settings">
+                                    Settings
+                                </MenuItem>
+                                <MenuItem onClick={() => { handleMenuClose(); logout(); }}>
+                                    Logout
+                                </MenuItem>
+                            </Menu>
+                        </div>
                     ) : (
-                        <Button color="inherit" onClick={logout} className="text-white hover:bg-indigo-700 rounded-md px-4 py-2">
-                            Logout
+                        <Button
+                            color="inherit"
+                            component={Link}
+                            to="/login"
+                            className="text-white hover:bg-indigo-700 rounded-md px-4 py-2"
+                        >
+                            Login
                         </Button>
                     )}
                 </div>
             </Toolbar>
-
             <Toaster position="top-center" reverseOrder={false} />
         </AppBar>
     );

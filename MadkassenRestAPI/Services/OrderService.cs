@@ -1,5 +1,5 @@
 ﻿using ClassLibrary.Model;
-using MadkassenRestAPI.Data;
+using MadkassenRestAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MadkassenRestAPI.Services;

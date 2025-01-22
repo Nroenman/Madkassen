@@ -24,6 +24,7 @@ namespace MadkassenRestAPI.Controllers
                 {
                     return Unauthorized(new { Message = "Incorrect email or password." });
                 }
+                var roles = user.Roles.Split(',');
 
                 // Generate JWT token with user ID as string
                 var token = JwtBuilder.Create()
@@ -35,6 +36,8 @@ namespace MadkassenRestAPI.Controllers
                     .IssuedAt(DateTimeOffset.Now.DateTime)
                     .ExpirationTime(DateTimeOffset.Now.AddHours(1).DateTime) 
                     .NotBefore(DateTimeOffset.Now.DateTime) 
+                    .AddClaim("roles", roles)
+
                     .Id(Guid.NewGuid().ToString()) 
                     .Encode();
 
