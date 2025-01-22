@@ -1,8 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useAddProductForm from "../Hooks/useAddProduct";
+import { jwtDecode } from 'jwt-decode';
 
 const AddProductPage = () => {
+    const navigate = useNavigate(); // For navigation
     const { productData, formError, handleChange, handleSubmit, loading, error } = useAddProductForm();
+
+    // Check if user is admin
+    useEffect(() => {
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
+        try {
+            const decodedToken = jwtDecode(token);
+            if (!decodedToken.roles || !decodedToken.roles.includes("Administrator")) {
+                navigate("/");
+            }
+        } catch (error) {
+            navigate("/login");
+        }
+    }, [navigate]);
 
     return (
         <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-gray-100">

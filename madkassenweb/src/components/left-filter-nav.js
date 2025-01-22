@@ -4,6 +4,7 @@ import {Drawer, List, ListItem, ListItemText, Collapse, Checkbox, FormControlLab
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useCategories from "../Hooks/useCategories";
+import { jwtDecode } from 'jwt-decode';
 
 const LeftFilterNav = ({setCategoryId, setSelectedAllergies}) => {
     const location = useLocation();
@@ -40,6 +41,13 @@ const LeftFilterNav = ({setCategoryId, setSelectedAllergies}) => {
         setSelectedAllergies(selectedAllergies); // Ensure the parent component is updated
     }, [selectedAllergies, setSelectedAllergies]);
 
+    const token = localStorage.getItem("authToken");
+    let isAdmin = false;
+    if (token) {
+        const decodedToken = jwtDecode(token);
+        isAdmin = decodedToken.roles && decodedToken.roles.includes("Administrator");
+    }
+
     if (!shouldShowSidebar) {
         return null;
     }
@@ -63,15 +71,19 @@ const LeftFilterNav = ({setCategoryId, setSelectedAllergies}) => {
                     width: 250,
                     boxSizing: "border-box",
                     marginTop: "64px",
+                    paddingBottom: "55px",
                 },
             }}
         >
             <List>
-                <ListItem>
-                    <Link to="/add-product" style={{textDecoration: "none", color: "inherit"}}>
-                        Add Product
-                    </Link>
-                </ListItem>
+                {/* Add product vises kun hvis brugeren er Administrator */}
+            {isAdmin && (
+                    <ListItem>
+                        <Link to="/add-product" style={{ textDecoration: "none", color: "inherit" }}>
+                            Add Product
+                        </Link>
+                    </ListItem>
+                )}
                 {/* Allergy Filter Dropdown */}
                 <ListItem button onClick={() => setAllergyDropdownOpen(!allergyDropdownOpen)}>
                     <ListItemText primary="Filtrer Allergener"/>
