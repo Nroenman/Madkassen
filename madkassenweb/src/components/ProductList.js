@@ -54,7 +54,7 @@ const ScrollableRow = ({ title, products }) => {
                         <Link
                             key={product.productId}
                             to={`/products/${product.productId}`}
-                            className="group w-40 flex-shrink-0"
+                            className="group flex-shrink-0 w-40 sm:w-36 md:w-40 lg:w-44 xl:w-48"
                         >
                             <img
                                 src={product.imageUrl}
@@ -133,7 +133,7 @@ const ProductList = ({ userId }) => {
         <div className="flex">
             <LeftFilterNav setCategoryId={setCategoryId} setSelectedAllergies={setSelectedAllergies} selectedAllergies={selectedAllergies} />
 
-            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+            <div className="flex-1 max-w-full sm:max-w-[calc(100%-250px)] lg:max-w-[calc(100%-300px)] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
                 <h2 className="sr-only">Produkter</h2>
 
                 {/* Show popular product rows only when no category is selected */}
