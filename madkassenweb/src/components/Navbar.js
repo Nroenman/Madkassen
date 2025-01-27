@@ -29,13 +29,13 @@ const Navbar = () => {
     return (
         <AppBar position="fixed" className="bg-indigo-600 shadow-md">
             <Toolbar className="flex justify-between items-center px-6 py-3">
-                {/* Left Section: Logo */}
-                <img
-                    src={thumbnailmad}
-                    alt="Madkassen Thumbnail"
-                    className="h-10 cursor-pointer"
-                    onClick={() => (window.location.href = "/")}
-                />
+                <Link to="/">
+                    <img
+                        src={thumbnailmad}
+                        alt="Madkassen Thumbnail"
+                        className="h-10 cursor-pointer"
+                    />
+                </Link>
 
                 {/* Middle Section: Navigation Tabs */}
                 <div className="flex-1 flex justify-center space-x-6">
